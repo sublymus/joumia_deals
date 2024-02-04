@@ -1,19 +1,19 @@
 import { DateTime } from 'luxon'
 import {v4} from 'uuid'
-import { BaseModel, HasOne, beforeSave, column, hasOne } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, beforeSave, column } from '@ioc:Adonis/Lucid/Orm'
 
 export default class Category extends BaseModel {
   @column({ isPrimary: true })
   public id: string
 
   @column()
-  public babel : string
+  public label : string
   
   @column()
-  public caracteristiqueField : string
+  public caracteristique_field : string
   
-  @hasOne(()=>Category)
-  public parent_category_id:  HasOne<typeof Category>
+  @column()
+  public parent_category_id:string
   
   @column()
   public isParentable : boolean
@@ -24,8 +24,12 @@ export default class Category extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
    public updatedAt: DateTime
 
-  @beforeSave()
-  public static async setUUID (category: Category) {
-    category.id = v4()
-  }
+   @beforeSave()
+   public static async setUUID (category: Category) {
+     category.id = v4()
+   }
+   
+   public static async getID (category: Category) {
+     return category.id
+   }
 }

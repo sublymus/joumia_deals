@@ -20,6 +20,9 @@ dependencies:
   '@adonisjs/repl':
     specifier: ^3.1.0
     version: 3.1.11(@adonisjs/core@5.9.0)
+  '@types/luxon':
+    specifier: ^3.4.2
+    version: 3.4.2
   '@types/uuid':
     specifier: ^9.0.8
     version: 9.0.8

@@ -24,6 +24,12 @@ Route.get('/google_connexion','AuthController.google_connexion');
 Route.get('/gl_push_info','AuthController.google_push_info');
 Route.post('/create_user','AuthController.create_user');
 Route.get('/disconnection','AuthController.disconnection');
+
+
+Route.get('/create_category','CategoriesController.create_category');// admin
+Route.get('/update_category','CategoriesController.update_category');// admin
+Route.get('/get_category','CategoriesController.get_category');// admin
+
 Route.get('/protected',()=>{
     return 'protected route'
 }).middleware('auth');
