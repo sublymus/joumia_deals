@@ -14,6 +14,9 @@ export default class AccessOauth extends BaseModel {
   public oauth_provider_name: string
 
   @column()
+  public init_id: string
+  
+  @column()
   public auth_table_name: string
 
   @column()

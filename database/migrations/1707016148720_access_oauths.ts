@@ -8,6 +8,7 @@ export default class extends BaseSchema {
       table.uuid('id').primary().notNullable()
       table.string('auth_table_name', 255)
       table.string('auth_table_id', 255)
+      table.string('init_id', 255)
       table.string('oauth_provider_name', 255).notNullable()
       table.string('original_id', 255).notNullable()
       table.string('oauth_client_unique').notNullable().unique()

@@ -24,4 +24,11 @@ export default Env.rules({
 	DB_CONNECTION: Env.schema.string(),
     DRIVE_DISK: Env.schema.enum(['local'] as const),
 	NODE_ENV: Env.schema.enum(['development', 'production', 'test'] as const),
+	//
+	//
+	FRONT_ORIGINE: Env.schema.string(),
+	FRONT_END_HOME: Env.schema.string(),
+	FRONT_END_CREATE_USER: Env.schema.string(),
+	GOOGLE_CALLBACK:Env.schema.string(),
+	GOOGLE:Env.schema.string(),
 })

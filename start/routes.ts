@@ -23,7 +23,7 @@ import Route from '@ioc:Adonis/Core/Route'
 Route.get('/google_connexion','AuthController.google_connexion');
 Route.get('/gl_push_info','AuthController.google_push_info');
 Route.post('/create_user','AuthController.create_user');
-Route.get('/deconnexion','AuthController.deconnexion');
+Route.get('/disconnection','AuthController.disconnection');
 Route.get('/protected',()=>{
     return 'protected route'
 }).middleware('auth');

@@ -1,8 +1,7 @@
-import { OpaqueTokenContract } from "@ioc:Adonis/Addons/Auth";
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import AccessOauth from "App/Models/AccessOauth";
 import Account from "App/Models/Account";
-import Acl from "App/Models/Acl";
+import Env from "@ioc:Adonis/Core/Env";
 
 export default class AuthController {
   public async google_connexion({ ally }: HttpContextContract) {
@@ -10,7 +9,7 @@ export default class AuthController {
     return ally.use("google").redirect();
   }
 
-  public async deconnexion({ auth }: HttpContextContract) {
+  public async disconnection({ auth }: HttpContextContract) {
     console.log("deconnexion");
     auth.use("api").revoke();
     return {
@@ -18,15 +17,25 @@ export default class AuthController {
     };
   }
 
-  public async google_push_info({ ally, auth }: HttpContextContract) {
-    return this.pusf_info({ ally, auth }, "google", "home", "create_user");
+  public async google_push_info({ ally, response, auth }: HttpContextContract) {
+    return this.pusf_info(
+      { ally, response, auth },
+      Env.get("GOOGLE"),
+      Env.get("FRONT_ORIGINE") + Env.get("FRONT_END_HOME"),
+      Env.get("FRONT_ORIGINE") + Env.get("FRONT_END_CREATE_USER")
+    );
   }
 
   private async pusf_info(
     {
       ally,
+      response,
       auth,
-    }: { ally: HttpContextContract["ally"]; auth: HttpContextContract["auth"] },
+    }: {
+      ally: HttpContextContract["ally"];
+      response: HttpContextContract["response"];
+      auth: HttpContextContract["auth"];
+    },
     providerName: string,
     homePage: string,
     createUserPage: string
@@ -58,23 +67,37 @@ export default class AuthController {
             " connexion required"
           );
         }
-        return {
-          page: homePage,
-          send: {
-            token: await auth
+
+        return response
+          .redirect()
+          .withQs({
+            page: Env.get("FRONT_END_HOME"),
+            ...(await auth
               .use("api")
-              .attempt(access.oauth_client_unique, access.original_id),
+              .attempt(access.oauth_client_unique, access.original_id)),
             phone: account.phone,
             location: account.location,
             name: account.name,
             email: account.email,
             avatarUrl: account.avatar_url,
-          },
-        } satisfies PushReturnType;
+          })
+          .toPath(homePage);
       } else {
-        return {
-          page: createUserPage,
-          send: {
+        console.log({
+          page: Env.get("FRONT_END_CREATE_USER"),
+          phone: null,
+          location: null,
+          name: name,
+          email,
+          avatarUrl,
+          oauth_client_id: access.password,
+          oauth_provider_name: access.oauth_provider_name,
+        });
+
+        return response
+          .redirect()
+          .withQs({
+            page: Env.get("FRONT_END_CREATE_USER"),
             phone: null,
             location: null,
             name: name,
@@ -82,8 +105,8 @@ export default class AuthController {
             avatarUrl,
             oauth_client_id: access.password,
             oauth_provider_name: access.oauth_provider_name,
-          },
-        } satisfies PushReturnType;
+          })
+          .toPath(createUserPage);
       }
     }
     const acces_oauth = await AccessOauth.create({
@@ -92,9 +115,22 @@ export default class AuthController {
       oauth_provider_name: providerName,
       original_id: id,
     });
-    return {
-      page: createUserPage,
-      send: {
+
+    console.log({
+      page: Env.get("FRONT_END_CREATE_USER"),
+      phone: null,
+      location: null,
+      name: name,
+      email,
+      avatarUrl,
+      oauth_client_id: acces_oauth.password,
+      oauth_provider_name: acces_oauth.$attributes.oauth_provider_name,
+    });
+
+    return response
+      .redirect()
+      .withQs({
+        page: Env.get("FRONT_END_CREATE_USER"),
         phone: null,
         location: null,
         name: name,
@@ -102,8 +138,8 @@ export default class AuthController {
         avatarUrl,
         oauth_client_id: acces_oauth.password,
         oauth_provider_name: acces_oauth.$attributes.oauth_provider_name,
-      },
-    } satisfies PushReturnType;
+      })
+      .toPath(createUserPage);
   }
 
   public async create_user({ request, auth }: HttpContextContract) {
@@ -185,17 +221,3 @@ export default class AuthController {
     };
   }
 }
-
-type PushReturnType = {
-  page: string;
-  send: {
-    phone: string | null;
-    location: string | null;
-    name: string;
-    email: string;
-    avatarUrl: string | null;
-    oauth_client_id?: string;
-    oauth_provider_name?: string;
-    token?: OpaqueTokenContract<AccessOauth>;
-  };
-};
