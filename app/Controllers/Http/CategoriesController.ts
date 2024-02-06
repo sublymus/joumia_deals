@@ -1,44 +1,45 @@
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import Category from "App/Models/Category";
+import { v4 } from "uuid";
 
 export default class CategoriesController {
   public async create_category({ request }: HttpContextContract) {
-    const { label, caracteristique_field, parent_category_id, isParentable } =
+    const { label, caracteristique_field, parent_category_id, is_parentable } =
       request.body();
+      
     if (
       !label ||
-      !caracteristique_field ||
-      !parent_category_id ||
-      !isParentable
+      !caracteristique_field || is_parentable ==undefined
     ) {
       return "ERROR field required : {label,carateristiqueField,parent_category_id,isParentable}";
     }
-    const cateogry = await Category.create({
+    const  id = v4()
+    const category = await Category.create({
       label,
-      caracteristique_field,
+      caracteristique_field:JSON.stringify(caracteristique_field),
       parent_category_id,
-      isParentable,
+      is_parentable: !!is_parentable,
+      id
     });
     return {
-      ...cateogry,
-      id: await Category.getID(cateogry),
+      ...category.$attributes,
+      id,
     };
   }
 
   public async update_category({ request }: HttpContextContract) {
-    const { id ,label, caracteristique_field, parent_category_id, isParentable } =
-      request.body();
-    if(!id)return 'ERROR required => "id"'
-    const cateogry = await Category.query()
-      .where("id", id)
-      .update({
-        label,
-        caracteristique_field,
-        parent_category_id,
-        isParentable,
-      });
+    const attributes = ['label', 'caracteristique_field', 'parent_category_id', 'is_parentable']
+    const body = request.body();
+      
+    if(!body.id)return 'ERROR required => "id"'
+    const category =  await Category.findByOrFail("id", body.id)
+    if(!category.is_parentable) return 'ERROR this category can\'t be use like parent category, pleas choise another one'
+   attributes.forEach(attribute => {
+    if(body[attribute])category[attribute] = body[attribute]
+   });
+    category.save()
     return {
-      ...cateogry,
+      ...category.$attributes,
     };
   }
 
@@ -47,7 +48,7 @@ export default class CategoriesController {
     if(!id)return 'ERROR required => "id"'
 
     return {
-      ... await Category.find(id),
+      ... (await Category.findOrFail(id)).$attributes,
     };
   }
 

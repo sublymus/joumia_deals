@@ -34,6 +34,6 @@ export default class Transaction extends BaseModel {
 
   @beforeSave()
   public static async setUUID (transaction: Transaction) {
-    transaction.id = v4()
+    if(!transaction.id)transaction.id = v4()
   }
 }

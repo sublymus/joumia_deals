@@ -22,6 +22,6 @@ export default class VisitedAccountProduct extends BaseModel {
 
   @beforeSave()
   public static async setUUID (visitedAccountProduct: VisitedAccountProduct) {
-    visitedAccountProduct.id = v4()
+    if(!visitedAccountProduct.id)visitedAccountProduct.id = v4()
   }
 }

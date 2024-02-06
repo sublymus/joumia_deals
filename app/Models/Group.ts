@@ -27,6 +27,6 @@ export default class Group extends BaseModel {
 
   @beforeSave()
   public static async setUUID (group: Group) {
-    group.id = v4()
+    if(!group.id)group.id = v4()
   }
 }

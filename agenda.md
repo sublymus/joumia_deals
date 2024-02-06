@@ -32,7 +32,8 @@ SUB_PAGE_PARAMETER  ( dark_mode ,  )
 ```jsx
 ROUTE = 'creation de route +  creation du test'
 
-ROUTE_AUTH + EDIT_PROFILE
+* ROUTE_AUTH
+*EDIT_PROFILE
 ROUTE_MODERATEUR
 ROUTE_ADMIN
 

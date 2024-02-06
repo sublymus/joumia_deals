@@ -67,7 +67,18 @@ export default class AuthController {
             " connexion required"
           );
         }
-
+        console.log({
+          page: Env.get("FRONT_END_HOME"),
+          ...(await auth
+            .use("api")
+            .attempt(access.oauth_client_unique, access.original_id)),
+          phone: account.phone,
+          location: account.location,
+          name: account.name,
+          email: account.email,
+          avatarUrl: account.avatar_url,
+        });
+        
         return response
           .redirect()
           .withQs({

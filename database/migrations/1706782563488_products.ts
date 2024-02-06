@@ -1,7 +1,7 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
 export default class extends BaseSchema {
-  protected tableName = 'product_valids'
+  protected tableName = 'products'
 
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
@@ -13,8 +13,8 @@ export default class extends BaseSchema {
       table.smallint('status').notNullable();
       table.timestamp('express_time', { useTz: true })
       table.timestamp('last_appearance', { useTz: true })
-      table.json('caracteristique').notNullable();
-      table.uuid('moderator_id').notNullable().references('id').inTable('moderators');
+      table.json('caracteristique');
+      table.uuid('moderator_id').references('id').inTable('moderators');
       table.uuid('category_id').notNullable().references('id').inTable('categories');
       table.uuid('account_id').notNullable().references('id').inTable('accounts');
       table.timestamp('created_at', { useTz: true })

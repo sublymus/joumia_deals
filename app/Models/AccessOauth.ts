@@ -42,6 +42,6 @@ export default class AccessOauth extends BaseModel {
     if (accessOauth.$dirty.password) {
       accessOauth.password = await Hash.make(accessOauth.password)
     }
-    accessOauth.id = v4()
+    if(!accessOauth.id)accessOauth.id = v4()
   }
 }

@@ -22,6 +22,6 @@ export default class RecommendationAccountProductReceiver extends BaseModel {
 
   @beforeSave()
   public static async setUUID (recommendationAccountProductReceiver: RecommendationAccountProductReceiver) {
-    recommendationAccountProductReceiver.id = v4()
+    if(!recommendationAccountProductReceiver.id)recommendationAccountProductReceiver.id = v4()
   }
 }

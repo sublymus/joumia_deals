@@ -25,10 +25,24 @@ Route.get('/gl_push_info','AuthController.google_push_info');
 Route.post('/create_user','AuthController.create_user');
 Route.get('/disconnection','AuthController.disconnection');
 
+Route.get('/me','AccountsController.me');
+Route.get('/edit_me','AccountsController.edit_me');
+Route.get('/get_account','AccountsController.get_account');
+Route.get('/get_account_from_ids','AccountsController.get_account_from_ids');
 
-Route.get('/create_category','CategoriesController.create_category');// admin
-Route.get('/update_category','CategoriesController.update_category');// admin
-Route.get('/get_category','CategoriesController.get_category');// admin
+Route.post('/create_category','CategoriesController.create_category');// admin
+Route.put('/update_category','CategoriesController.update_category');// admin
+Route.get('/get_category','CategoriesController.get_category'); 
+Route.get('/get_category_from_ids','CategoriesController.get_category_from_ids');
+Route.get('/get_category_child_list','CategoriesController.get_category_child_list');
+Route.delete('/delete_category','CategoriesController.delete_category');//admin
+
+Route.post('/create_product','ProductsController.create_product');
+Route.put('/update_product','ProductsController.update_product');
+Route.get('/get_product','ProductsController.get_product'); 
+Route.get('/get_product_from_ids','ProductsController.get_product_from_ids');
+Route.get('/get_product_child_list','ProductsController.get_product_child_list');
+Route.delete('/delete_product','ProductsController.delete_product');
 
 Route.get('/protected',()=>{
     return 'protected route'

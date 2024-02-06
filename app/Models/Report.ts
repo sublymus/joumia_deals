@@ -28,6 +28,6 @@ export default class Report extends BaseModel {
 
   @beforeSave()
   public static async setUUID (report: Report) {
-    report.id = v4()
+    if(!report.id)report.id = v4()
   }
 }

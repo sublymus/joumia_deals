@@ -2,8 +2,10 @@ import { DateTime } from 'luxon'
 import {v4} from 'uuid'
 import { BaseModel, HasOne, beforeSave, column, hasOne } from '@ioc:Adonis/Lucid/Orm'
 import Category from './Category'
-import Account from './Account'
 
+export enum PRODUCT_STATUS{
+  AWAIT,VALID,REJECT,
+} 
 export default class Product extends BaseModel {
   @column({ isPrimary: true })
   public id: string
@@ -12,7 +14,7 @@ export default class Product extends BaseModel {
   public title: string
 
   @column()
-  public subTitle: string
+  public subtitle: string
 
   @column.dateTime({ autoCreate: true })
   public express_time: DateTime
@@ -27,19 +29,19 @@ export default class Product extends BaseModel {
   public caracteristique: string
 
   @column()
-  public status: 1 | 2 | 3
+  public status: PRODUCT_STATUS
 
   @column()
   public price: number
 
-  @hasOne(()=>Category)
-  public category_id:  HasOne<typeof Category>
+  @column()
+  public category_id: string
 
-  @hasOne(()=>Product)
-  public product_id:  HasOne<typeof Product>
-
-  @hasOne(()=>Account)
-  public account_id:  HasOne<typeof Account>
+  @column()
+  public account_id: string
+  
+  @column()
+  public moderator_id : string
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
@@ -49,6 +51,6 @@ export default class Product extends BaseModel {
 
   @beforeSave()
   public static async setUUID (product: Product) {
-    product.id = v4()
+   if(!product.id)product.id = v4()
   }
 }

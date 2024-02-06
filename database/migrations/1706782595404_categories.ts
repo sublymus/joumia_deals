@@ -6,10 +6,10 @@ export default class extends BaseSchema {
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().notNullable()
-      table.text('babel').notNullable();
-      table.json('caracteristiqueField').notNullable();
-      table.uuid('parent_category_id').notNullable().references('id').inTable('categories');
-      table.boolean('isParentable').notNullable();
+      table.text('label').notNullable();
+      table.json('caracteristique_field');
+      table.uuid('parent_category_id').references('categories.id');
+      table.boolean('is_parentable');
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })

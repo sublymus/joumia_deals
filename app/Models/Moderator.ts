@@ -23,7 +23,7 @@ export default class Moderator extends BaseModel {
 
   @beforeSave()
   public static async setUUID (moderator: Moderator) {
-    moderator.id = v4()
+    if(!moderator.id)moderator.id = v4()
   }
 
 }

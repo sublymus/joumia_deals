@@ -22,6 +22,6 @@ export default class RecommendationClientProviderReceiver extends BaseModel {
 
   @beforeSave()
   public static async setUUID (recommendationClientProviderReceiver: RecommendationClientProviderReceiver) {
-    recommendationClientProviderReceiver.id = v4()
+    if(!recommendationClientProviderReceiver.id)recommendationClientProviderReceiver.id = v4()
   }
 }

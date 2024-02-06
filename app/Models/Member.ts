@@ -29,6 +29,6 @@ export default class Member extends BaseModel {
 
   @beforeSave()
   public static async setUUID (member: Member) {
-    member.id = v4()
+    if(!member.id)member.id = v4()
   }
 }

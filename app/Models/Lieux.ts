@@ -37,6 +37,6 @@ export default class Lieux extends BaseModel {
 
   @beforeSave()
   public static async setUUID (lieux: Lieux) {
-    lieux.id = v4()
+    if(!lieux.id)lieux.id = v4()
   }
 }

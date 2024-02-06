@@ -23,6 +23,6 @@ export default class PaymentReference extends BaseModel {
 
   @beforeSave()
   public static async setUUID (paymentReference: PaymentReference) {
-    paymentReference.id = v4()
+    if(!paymentReference.id)paymentReference.id = v4()
   }
 }

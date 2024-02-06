@@ -25,6 +25,6 @@ export default class Message extends BaseModel {
 
   @beforeSave()
   public static async setUUID (message: Message) {
-    message.id = v4()
+    if(!message.id)message.id = v4()
   }
 }

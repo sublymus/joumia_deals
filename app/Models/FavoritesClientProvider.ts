@@ -21,6 +21,6 @@ export default class FavoritesClientProvider extends BaseModel {
 
   @beforeSave()
   public static async setUUID (favoritesClientProvider: FavoritesClientProvider) {
-    favoritesClientProvider.id = v4()
+    if(!favoritesClientProvider.id)favoritesClientProvider.id = v4()
   }
 }

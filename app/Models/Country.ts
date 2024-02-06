@@ -26,6 +26,6 @@ export default class Country extends BaseModel {
 
   @beforeSave()
   public static async setUUID (country: Country) {
-    country.id = v4()
+    if(!country.id)country.id = v4()
   }
 }

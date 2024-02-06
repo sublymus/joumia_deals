@@ -39,6 +39,6 @@ export default class File extends BaseModel {
 
   @beforeSave()
   public static async setUUID(file: File) {
-    file.id = v4();
+    if(!file.id)file.id = v4();
   }
 }

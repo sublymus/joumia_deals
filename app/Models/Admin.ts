@@ -20,6 +20,6 @@ export default class Admin extends BaseModel {
 
   @beforeSave()
   public static async setUUID (admin: Admin) {
-    admin.id = v4()
+    if(!admin.id)admin.id = v4()
   }
 }

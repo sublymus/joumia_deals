@@ -21,6 +21,6 @@ export default class Vote extends BaseModel {
 
   @beforeSave()
   public static async setUUID (vote: Vote) {
-    vote.id = v4()
+    if(!vote.id)vote.id = v4()
   }
 }

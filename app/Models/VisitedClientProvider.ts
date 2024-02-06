@@ -21,6 +21,6 @@ export default class VisitedClientProvider extends BaseModel {
 
   @beforeSave()
   public static async setUUID (visitedClientProvider: VisitedClientProvider) {
-    visitedClientProvider.id = v4()
+    if(!visitedClientProvider.id)visitedClientProvider.id = v4()
   }
 }

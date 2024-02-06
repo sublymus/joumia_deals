@@ -47,6 +47,6 @@ export default class Rule extends BaseModel {
 
   @beforeSave()
   public static async setUUID (rule: Rule) {
-    rule.id = v4()
+    if(!rule.id)rule.id = v4()
   }
 }

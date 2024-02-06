@@ -22,7 +22,7 @@ export default class FavoritesAccountProduct extends BaseModel {
 
   @beforeSave()
   public static async setUUID (favoritesAccountProduct: FavoritesAccountProduct) {
-    favoritesAccountProduct.id = v4()
+    if(!favoritesAccountProduct.id)favoritesAccountProduct.id = v4()
   }
 }
  

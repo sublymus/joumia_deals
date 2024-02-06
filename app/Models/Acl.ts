@@ -30,6 +30,6 @@ export default class Acl extends BaseModel {
 
   @beforeSave()
   public static async setUUID (acl: Acl) {
-    acl.id = v4()
+    if(!acl.id)acl.id = v4()
   }
 }
