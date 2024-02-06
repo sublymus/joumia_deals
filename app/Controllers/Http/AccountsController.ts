@@ -21,6 +21,7 @@ export default class AccountsController {
     attributes.forEach((attribute) => {
       if (body[attribute]) account[attribute] = body[attribute];
     });
+    
     account.save();
     return Account.formatAccount(account)
   }

@@ -15,10 +15,10 @@ export default class RecommendationAccountProductReceiver extends BaseModel {
   public receiver_account_id:  HasOne<typeof Account>
 
   @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
+  public created_at: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-   public updatedAt: DateTime
+   public updated_at: DateTime
 
   @beforeSave()
   public static async setUUID (recommendationAccountProductReceiver: RecommendationAccountProductReceiver) {

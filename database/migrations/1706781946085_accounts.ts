@@ -6,10 +6,10 @@ export default class extends BaseSchema {
   public async up () { 
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().notNullable();
-      table.string('name',50).notNullable();
+      table.string('name',30).notNullable();
       table.text('location').notNullable();
       table.text('email').notNullable().unique();
-      table.text('avatar_url').notNullable();
+      table.text('avatar_url')
       table.text('access_id').notNullable();
       table.text('phone').notNullable();
       table.uuid('acl_id').references('id').inTable('acls')

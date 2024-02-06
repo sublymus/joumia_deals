@@ -20,10 +20,10 @@ export default class Group extends BaseModel {
   public product_id: HasOne<typeof Product>
 
   @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
+  public created_at: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-   public updatedAt: DateTime
+   public updated_at: DateTime
 
   @beforeSave()
   public static async setUUID (group: Group) {

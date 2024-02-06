@@ -33,7 +33,7 @@ SUB_PAGE_PARAMETER  ( dark_mode ,  )
 ROUTE = 'creation de route +  creation du test'
 
 * ROUTE_AUTH
-*EDIT_PROFILE
+* EDIT_PROFILE
 ROUTE_MODERATEUR
 ROUTE_ADMIN
 
@@ -42,6 +42,9 @@ ROUTE_FILTER ( product , account , moderator  )
 
 ROUTE_MESSENGER
 ROUTE_VOTE
+
+VALIDATION
+PERMISSION
 
 ROUTE_ACTION_USER ( recommendation , visited , favorites , report )
 
@@ -54,4 +57,43 @@ HOSTINGER_PROD
 TEST_PROD
 ```
 
+
+
+edit profile => page
+
+notificaton  => page
+
+messagerie => page
+
+paramerte => page
+
+mes annone , recommendation , historique , favorites , report 
+
+++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++
+
+++++++++++++++++++++++++++++++++++++++++++
+            1  ,  2 ,  3 ,  4 ->
+_______________________________________________________________
+
+recommendation
+
+++++++  ++++++++  ++++++   +++++++
+
+visited
+ 
+++++++  ++++++++  ++++++   +++++++
+
+favorites
+  
+++++++  ++++++++  ++++++   +++++++
+
+report
+
+++++++  ++++++++  ++++++   +++++++
 

@@ -51,7 +51,8 @@ export default class AuthController {
     if (provider.hasError()) {
       return provider.getError();
     }
-    const { id, email, avatarUrl, name } = await provider.user();
+    const { id, email, avatarUrl:avatar_url, name } = await provider.user();
+  
     if (!email) {
       return providerName + " request user email";
     }
@@ -67,40 +68,30 @@ export default class AuthController {
             " connexion required"
           );
         }
-        console.log({
-          page: Env.get("FRONT_END_HOME"),
-          ...(await auth
+        console.log("deja cree",{
+          token:(await auth
             .use("api")
-            .attempt(access.oauth_client_unique, access.original_id)),
-          phone: account.phone,
-          location: account.location,
-          name: account.name,
-          email: account.email,
-          avatarUrl: account.avatar_url,
+            .attempt(access.oauth_client_unique, access.original_id)).token,
+          ...Account.formatAccount(account)
+          
         });
         
         return response
           .redirect()
           .withQs({
-            page: Env.get("FRONT_END_HOME"),
-            ...(await auth
+            token:(await auth
               .use("api")
-              .attempt(access.oauth_client_unique, access.original_id)),
-            phone: account.phone,
-            location: account.location,
-            name: account.name,
-            email: account.email,
-            avatarUrl: account.avatar_url,
+              .attempt(access.oauth_client_unique, access.original_id)).token,
+            ...Account.formatAccount(account)
           })
           .toPath(homePage);
       } else {
-        console.log({
-          page: Env.get("FRONT_END_CREATE_USER"),
+        console.log("connecte va cree",{
           phone: null,
           location: null,
           name: name,
           email,
-          avatarUrl,
+          avatar_url,
           oauth_client_id: access.password,
           oauth_provider_name: access.oauth_provider_name,
         });
@@ -108,12 +99,11 @@ export default class AuthController {
         return response
           .redirect()
           .withQs({
-            page: Env.get("FRONT_END_CREATE_USER"),
             phone: null,
             location: null,
             name: name,
             email,
-            avatarUrl,
+            avatar_url,
             oauth_client_id: access.password,
             oauth_provider_name: access.oauth_provider_name,
           })
@@ -127,13 +117,12 @@ export default class AuthController {
       original_id: id,
     });
 
-    console.log({
-      page: Env.get("FRONT_END_CREATE_USER"),
+    console.log('first connect va cree',{
       phone: null,
       location: null,
       name: name,
       email,
-      avatarUrl,
+      avatar_url,
       oauth_client_id: acces_oauth.password,
       oauth_provider_name: acces_oauth.$attributes.oauth_provider_name,
     });
@@ -141,12 +130,11 @@ export default class AuthController {
     return response
       .redirect()
       .withQs({
-        page: Env.get("FRONT_END_CREATE_USER"),
         phone: null,
         location: null,
         name: name,
         email,
-        avatarUrl,
+        avatar_url,
         oauth_client_id: acces_oauth.password,
         oauth_provider_name: acces_oauth.$attributes.oauth_provider_name,
       })
@@ -157,7 +145,7 @@ export default class AuthController {
     const {
       phone,
       name,
-      avatarUrl,
+      avatar_url,
       location,
       email,
       oauth_client_id,
@@ -201,7 +189,7 @@ export default class AuthController {
       await Account.create({
         name,
         phone,
-        avatar_url: avatarUrl,
+        avatar_url: avatar_url,
         email,
         location,
         access_id: myAccess.id,
@@ -222,13 +210,10 @@ export default class AuthController {
     }
 
     return {
-      page: "home",
-      send: {
-        ...account.$attributes,
-        token: await auth
+        ...Account.formatAccount(account),
+        token: (await auth
           .use("api")
-          .attempt(myAccess.oauth_client_unique, myAccess.original_id),
-      },
+          .attempt(myAccess.oauth_client_unique, myAccess.original_id)).token,
     };
   }
 }

@@ -29,10 +29,10 @@ export default class Account extends BaseModel {
   public acl_id: string;
 
   @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime;
+  public created_at: DateTime;
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedAt: DateTime;
+  public updated_at: DateTime;
 
   @beforeSave()
   public static async setUUID(account: Account) {
@@ -50,6 +50,8 @@ export default class Account extends BaseModel {
       ...account.$attributes,
       access_id: undefined,
       acl_id: undefined,
+      created_at : account.created_at.toString(),
+      updated_at : account.updated_at.toString()
     };
   }
 }
