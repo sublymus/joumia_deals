@@ -2,8 +2,10 @@ import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import Database from "@ioc:Adonis/Lucid/Database";
 import Account from "App/Models/Account";
 import Category from "App/Models/Category";
-import Product, { PRODUCT_STATUS } from "App/Models/Product";
+import Product from "App/Models/Product";
+// import env from "env";
 import { v4 } from "uuid";
+import CategoriesController from "./CategoriesController";
 
 export default class ProductsController {
   public async create_product({ request, auth }: HttpContextContract) {
@@ -44,7 +46,7 @@ export default class ProductsController {
       description,
       price,
       caracteristique,
-      status: PRODUCT_STATUS.AWAIT,
+      status: Product.STATUS.AWAIT,
       account_id: account.id,
       category_id,
       // express_time:'',
@@ -61,7 +63,7 @@ export default class ProductsController {
   public async update_product({ request }: HttpContextContract) {
     const attributes = [
       "title",
-      "sub_title",
+      "subtitle",
       "description",
       "price",
       "category_id",
@@ -70,11 +72,16 @@ export default class ProductsController {
     const body = request.body();
 
     if (!body.id) return 'ERROR required => "id"';
+    if (body.category_id) {
+      //TODO trouver solution pour capturer l'error au lieu de trouver la cat..
+      const category = await Category.find(body.category_id);
+      if (!category) return "ERROR category not found";
+    }
     const product = await Product.findByOrFail("id", body.id);
     attributes.forEach((attribute) => {
       if (body[attribute]) product[attribute] = body[attribute];
     });
-    product.save();
+    await product.save();
     const account = await Account.findOrFail(product.account_id);
     return {
       ...product.$attributes,
@@ -94,28 +101,81 @@ export default class ProductsController {
     };
   }
 
-  // public async get_products({ request }: HttpContextContract) {
-  //   const {  } = request.body() as {
-  //     provider_id?: string;
-  //     page?: number;//1
-  //     limit?: number; //30
-  //     filter?: {
-  //       name?: string;
-  //       order_by?: "date_desc" | "date_asc" | "price_desc" | "price_asc";
-  //       prix?: [min, max];
-  //       category_id?: uuid;
-  //       caracteristique?: string;
-  //     };
-  //   };
-  //   if (!id) return 'ERROR required => "id"';
 
-  //   const product = await Product.findByOrFail("id", id);
-  //   const account = await Account.findOrFail(product.account_id);
-  //   return {
-  //     ...product.$attributes,
-  //     provider: Account.formatAccount(account),
-  //   };
-  // }
+  public async filter_product({ request }: HttpContextContract) {
+    let { provider_id, page, limit, filter } = request.body() as {
+      provider_id?: string;
+      page?: number; //1
+      limit?: number; //30
+      filter?: {
+        text?: string;
+        order_by?: "date_desc" | "date_asc" | "price_desc" | "price_asc";
+        price?: [number, number];
+        category_id?: string;
+        // caracteristique?: string;
+      };
+    };
+
+    if (page && page < 1) return " page must be between [1 ,n] ";
+    if (limit && limit < 1) return " limite must be between [1 ,n] ";
+    page = page ?? 1;
+    limit = limit ?? 25; //TODO use env.default_limit
+
+    let query = Product.query()
+      .select("*")
+      // .where("status", PRODUCT_STATUS.VALID); //TODO product.valid
+
+    if (provider_id) {
+      query = query.where("account_id", provider_id);
+    }
+    if (filter?.price) {
+      query = query.andWhereBetween("price", filter.price);
+    }
+    if (filter?.text) {
+      const text = filter.text;
+      const regex = `%${text.split("").join("%")}%`;
+      query = query.andWhere((q) => {
+        q.whereLike("title", regex)
+          .orWhereLike("subtitle", regex)
+          .orWhereLike("description", regex);
+      });
+    }
+
+    if (filter && (filter.category_id!==undefined || filter.category_id === null)) {
+      const list = [filter.category_id];
+      await CategoriesController.allChildren(filter.category_id,list)
+      console.log({list});
+      query = query.andWhereIn("category_id", list);
+    }
+
+    if (filter?.order_by) {
+      switch (filter.order_by) {
+        case "date_asc":
+          query = query.orderBy("created_at", "asc");
+          break;
+
+        case "date_desc":
+          query = query.orderBy("created_at", "desc");
+          break;
+
+        case "price_asc":
+          query = query.orderBy("price", "asc");
+          break;
+
+        case "price_desc":
+          query = query.orderBy("price", "desc");
+          break;
+
+        default:
+          query = query.orderBy("created_at", "desc");
+          break;
+      }
+    }
+    const products = await query.limit(limit).offset((page - 1) * limit);
+    return {
+      ...products,
+    };
+  }
 
   public async get_product_from_ids({ request }: HttpContextContract) {
     const { ids } = request.body();
@@ -127,7 +187,6 @@ export default class ProductsController {
       .select("accounts.created_at as acreated_at")
       .select("accounts.updated_at as aupdated_at")
       .innerJoin("products", "products.account_id", "accounts.id")
-      // .whereColumn("products.account_id", "accounts.id")
       .whereIn("products.id", ids);
 
     const accountAttributes = [
@@ -143,8 +202,6 @@ export default class ProductsController {
       "aupdated_at",
     ];
     const accountRename = {
-      acl_id: "",
-      access_id: "",
       aid: "id",
       aupdated_at: "updated_at",
       acreated_at: "created_at",
@@ -154,8 +211,7 @@ export default class ProductsController {
         product.provider = {};
         for (const key in product) {
           if (accountAttributes.includes(key)) {
-            product.provider[accountRename[key] ? accountRename[key] : key] =
-              product[key];
+            product.provider[accountRename[key] ?? key] = product[key];
             delete product[key];
           }
         }

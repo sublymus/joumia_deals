@@ -43,4 +43,15 @@ export default class AccountsController {
       ...(await Account.query().whereIn("id", ids)).map((account) =>  Account.formatAccount(account)),
     };
   }
+
+  public async get_all_account({ request }: HttpContextContract) {
+    let { page, limit } = request.body();
+    if (page < 1) return " page must be between [1 ,n] ";
+    if (limit < 1) return " limite must be between [1 ,n] ";
+    page = page??1;
+    limit = limit??25
+    return {
+      ...(await Account.query().select('*').limit(limit).offset((page-1)*limit)).map((account) =>  Account.formatAccount(account)),
+    };
+  }
 }

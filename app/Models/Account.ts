@@ -46,12 +46,13 @@ export default class Account extends BaseModel {
   }
 
   public static  formatAccount(account: Account) {
+    
     return {
       ...account.$attributes,
       access_id: undefined,
       acl_id: undefined,
-      created_at : account.created_at.toString(),
-      updated_at : account.updated_at.toString()
+      created_at : account.$attributes.created_at.toString(),
+      updated_at : account.$attributes.updated_at.toString()
     };
   }
 }

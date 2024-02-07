@@ -37,4 +37,5 @@ export default Env.rules({
 	FRONT_END_CREATE_USER: Env.schema.string(),
 	GOOGLE_CALLBACK:Env.schema.string(),
 	GOOGLE:Env.schema.string(),
+	DEFAULT_LIMIT:Env.schema.number()
 })

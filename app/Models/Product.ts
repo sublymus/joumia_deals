@@ -1,12 +1,12 @@
 import { DateTime } from 'luxon'
 import {v4} from 'uuid'
-import { BaseModel, HasOne, beforeSave, column, hasOne } from '@ioc:Adonis/Lucid/Orm'
-import Category from './Category'
+import { BaseModel, beforeSave, column } from '@ioc:Adonis/Lucid/Orm'
 
-export enum PRODUCT_STATUS{
-  AWAIT,VALID,REJECT,
+enum PRODUCT_STATUS{
+  AWAIT,VALID,REJECT,DELETED,
 } 
 export default class Product extends BaseModel {
+  public static STATUS = PRODUCT_STATUS
   @column({ isPrimary: true })
   public id: string
 

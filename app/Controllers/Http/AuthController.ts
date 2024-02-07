@@ -5,12 +5,10 @@ import Env from "@ioc:Adonis/Core/Env";
 
 export default class AuthController {
   public async google_connexion({ ally }: HttpContextContract) {
-    console.log("google_connexion");
     return ally.use("google").redirect();
   }
 
   public async disconnection({ auth }: HttpContextContract) {
-    console.log("deconnexion");
     auth.use("api").revoke();
     return {
       connexion: false,
@@ -40,7 +38,7 @@ export default class AuthController {
     homePage: string,
     createUserPage: string
   ) {
-    const provider = ally.use("google");
+    const provider = ally.use(providerName);
 
     if (provider.accessDenied()) {
       return providerName + " access was denied";
@@ -56,26 +54,19 @@ export default class AuthController {
     if (!email) {
       return providerName + " request user email";
     }
+
     const access = await AccessOauth.findBy("oauth_client_unique", email);
     if (access) {
       if (access.auth_table_id && access.auth_table_name) {
         const account = await Account.find(access.auth_table_id);
         if (!account) {
-          access.delete();
+         await access.delete();
           return (
             "ERROR Account not found, new " +
             providerName +
             " connexion required"
           );
-        }
-        console.log("deja cree",{
-          token:(await auth
-            .use("api")
-            .attempt(access.oauth_client_unique, access.original_id)).token,
-          ...Account.formatAccount(account)
-          
-        });
-        
+        }       
         return response
           .redirect()
           .withQs({
@@ -86,16 +77,6 @@ export default class AuthController {
           })
           .toPath(homePage);
       } else {
-        console.log("connecte va cree",{
-          phone: null,
-          location: null,
-          name: name,
-          email,
-          avatar_url,
-          oauth_client_id: access.password,
-          oauth_provider_name: access.oauth_provider_name,
-        });
-
         return response
           .redirect()
           .withQs({
@@ -115,16 +96,6 @@ export default class AuthController {
       oauth_client_unique: email,
       oauth_provider_name: providerName,
       original_id: id,
-    });
-
-    console.log('first connect va cree',{
-      phone: null,
-      location: null,
-      name: name,
-      email,
-      avatar_url,
-      oauth_client_id: acces_oauth.password,
-      oauth_provider_name: acces_oauth.$attributes.oauth_provider_name,
     });
 
     return response
@@ -182,7 +153,7 @@ export default class AuthController {
     if (myAccess.auth_table_id && myAccess.auth_table_name) {
       account = await Account.find(myAccess.auth_table_id);
       if (!account) {
-        myAccess.delete();
+        await myAccess.delete();
         return "ERROR Account not found, new connexion required";
       }
     } else {
@@ -196,7 +167,7 @@ export default class AuthController {
       });
       account = await Account.findBy("email", email);
       if (!account) {
-        myAccess.delete();
+        await myAccess.delete();
         return "ERROR Account not created, new connexion required";
       }
       /*
