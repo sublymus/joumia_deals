@@ -10,7 +10,6 @@ export default class extends BaseSchema {
       table.text('message').notNullable();
       table.uuid('product_id').notNullable().references('id').inTable('products');
       table.uuid('client_account_id').references('id').inTable('accounts').notNullable();
-      table.uuid('provider_account_id').references('id').inTable('accounts').notNullable();
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })
@@ -20,3 +19,4 @@ export default class extends BaseSchema {
     this.schema.dropTable(this.tableName)
   }
 }
+ 

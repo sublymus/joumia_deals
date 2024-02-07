@@ -1,26 +1,18 @@
 import { DateTime } from 'luxon'
-import {v4} from 'uuid'
-import { BaseModel, HasOne, beforeSave, column, hasOne } from '@ioc:Adonis/Lucid/Orm'
-import Account from './Account'
+import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+
 
 export default class FavoritesClientProvider extends BaseModel {
-  @column({ isPrimary: true })
-  public id: string
+  
+  @column()
+  public my_account_id:  string
 
-  @hasOne(()=>Account)
-  public client_account_id:  HasOne<typeof Account>
-
-  @hasOne(()=>Account)
-  public provider_account_id:  HasOne<typeof Account>
+  @column()
+  public other_account_id: string
 
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
    public updated_at: DateTime
-
-  @beforeSave()
-  public static async setUUID (favoritesClientProvider: FavoritesClientProvider) {
-    if(!favoritesClientProvider.id)favoritesClientProvider.id = v4()
-  }
 }

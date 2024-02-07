@@ -127,7 +127,7 @@ export default class ProductsController {
       .select("accounts.created_at as acreated_at")
       .select("accounts.updated_at as aupdated_at")
       .innerJoin("products", "products.account_id", "accounts.id")
-      .whereColumn("products.account_id", "accounts.id")
+      // .whereColumn("products.account_id", "accounts.id")
       .whereIn("products.id", ids);
 
     const accountAttributes = [
