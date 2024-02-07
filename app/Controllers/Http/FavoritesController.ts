@@ -14,7 +14,7 @@ export default class FavoritesController {
       product_id,
     });
     return {
-        added:true
+        added:favorite.$isPersisted
     };
   }
   public async get_favorite_products({ request, auth }: HttpContextContract) {
@@ -27,9 +27,9 @@ export default class FavoritesController {
       .select("*")
       .select("favorites_account_products.created_at as favorite_created_at")
       .select("favorites_account_products.updated_at as favorite_updated_at")
-      .select("products.created_at as products_created_at")
-      .select("products.updated_at as products_updated_at")
-      .innerJoin("products", "products.account_id", "product_id")
+      .select("products.created_at as product_created_at")
+      .select("products.updated_at as product_updated_at")
+      .innerJoin("products", "products.id", "product_id")
       .whereColumn("account_id",account.id)
       .limit(limite)
       .offset((page - 1) * limite);
@@ -48,7 +48,8 @@ export default class FavoritesController {
     const account = await auth.authenticate();
     const favorites = await FavoritesAccountProduct.query()
       .where("account_id", account.id)
-      .andWhere("product_id", id);
+      .andWhere("product_id", id)
+      .limit(1)
 
     const favorite = favorites[0];
     await favorite?.delete();
@@ -80,9 +81,9 @@ export default class FavoritesController {
     .select("*")
     .select("favorites_client_providers.created_at as favorite_created_at")
     .select("favorites_client_providers.updated_at as favorite_updated_at")
-    .select("products.created_at as products_created_at")
-    .select("products.updated_at as products_updated_at")
-    .innerJoin("products", "products.account_id", "product_id")
+    .select("products.created_at as product_created_at")
+    .select("products.updated_at as product_updated_at")
+    .innerJoin("products", "products.id", "product_id")
     .whereColumn("my_account_id",account.id)
     .limit(limite)
     .offset((page - 1) * limite);
@@ -101,7 +102,8 @@ export default class FavoritesController {
     const account = await auth.authenticate();
     const favorites = await FavoritesClientProvider.query()
       .where("my_account_id", account.id)
-      .andWhere("other_account_id", account.id);
+      .andWhere("other_account_id", id)
+      .limit(1)
 
     const favorite = favorites[0];
     await favorite?.delete();

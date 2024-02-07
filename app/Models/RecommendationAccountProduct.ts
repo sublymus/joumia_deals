@@ -1,18 +1,16 @@
 import { DateTime } from 'luxon'
-import {v4} from 'uuid'
-import { BaseModel, HasOne, beforeSave, column, hasOne } from '@ioc:Adonis/Lucid/Orm'
-import Product from './Product'
-import Account from './Account'
+import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+
 
 export default class RecommendationAccountProduct extends BaseModel {
   @column({ isPrimary: true })
   public id: string
-  
-  @hasOne(()=>Product)
-  public product_id:  HasOne<typeof Product>
 
-  @hasOne(()=>Account)
-  public account_id:  HasOne<typeof Account>
+  @column()
+  public product_id: string
+
+  @column()
+  public my_account_id: string
 
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime
@@ -20,8 +18,4 @@ export default class RecommendationAccountProduct extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
    public updated_at: DateTime
 
-  @beforeSave()
-  public static async setUUID (recommendationAccountProduct: RecommendationAccountProduct) {
-    if(!recommendationAccountProduct.id)recommendationAccountProduct.id = v4()
-  }
 }
