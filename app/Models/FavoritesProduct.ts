@@ -1,13 +1,14 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel,  column } from '@ioc:Adonis/Lucid/Orm'
 
-export default class RecommendationAccountProductReceiver extends BaseModel {
 
-  @column()
-  public recommendation_id: string
+export default class FavoritesProduct extends BaseModel {
 
   @column()
-  public receiver_account_id:string
+  public product_id:  string
+
+  @column()
+  public account_id: string
 
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime
@@ -16,3 +17,4 @@ export default class RecommendationAccountProductReceiver extends BaseModel {
    public updated_at: DateTime
 
 }
+ 

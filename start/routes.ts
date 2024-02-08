@@ -59,10 +59,22 @@ Route.delete('/delete_recommendation_account','RecommendationsController.delete_
 Route.delete('/delete_recommendation_product','RecommendationsController.delete_recommendation_product');
 
 Route.post('/report_product','ReportsController.report_product');
+Route.post('/report_account','ReportsController.report_account');
 Route.get('/get_products_reported','ReportsController.get_products_reported');
+Route.get('/get_accounts_reported','ReportsController.get_accounts_reported');
 
-Route.get('/protected',()=>{
-    return 'protected route'
+
+Route.post('/add_favorite_account','FavoritesController.add_favorite_account');
+Route.post('/add_favorite_product','FavoritesController.add_favorite_product');
+Route.get('/get_favorite_accounts','FavoritesController.get_favorite_accounts');
+Route.get('/get_favorite_products','FavoritesController.get_favorite_products');
+Route.delete('/delete_favorite_account','FavoritesController.delete_favorite_account');
+Route.delete('/delete_favorite_product','FavoritesController.delete_favorite_product');
+
+Route.get('/try_token',()=>{
+    return {
+        valid :true
+    }
 }).middleware('auth');
 
 Route.get('/',({response}:HttpContext)=>{

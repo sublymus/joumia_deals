@@ -1,15 +1,12 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
 export default class extends BaseSchema {
-  protected tableName = 'reports'
+  protected tableName = 'visited_products'
 
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
-      table.uuid('id').primary().notNullable()
-
-      table.text('message').notNullable();
-      table.uuid('product_id').notNullable().references('id').inTable('products');
-      table.uuid('client_account_id').references('id').inTable('accounts').notNullable();
+      table.uuid('product_id').notNullable().references('id').inTable('products')
+      table.uuid('account_id').notNullable().references('id').inTable('accounts')
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })
@@ -19,4 +16,3 @@ export default class extends BaseSchema {
     this.schema.dropTable(this.tableName)
   }
 }
- 

@@ -69,8 +69,8 @@ ROUTE = 'creation de route +  creation du test'
 ##  update_category
 ##  delete_category
 ##  get_category_from_ids
-    categories_filter
-// inserte('category')
+##  categories_filter
+
 
 # ROUTE_MODERATEUR
 ##  create_moderator
@@ -80,6 +80,15 @@ ROUTE = 'creation de route +  creation du test'
 ##  get_moderator_from_ids
 ##  change_moderator_key
     moderator_filter
+
+
+// db.inserte('account')
+// db.inserte('category')
+// db.inserte('product')
+// db.inserte('report')
+// db.inserte('recoomendation')
+// db.inserte('favorites')
+// db.inserte('visited')
 
 ROUTE_ADMIN
 

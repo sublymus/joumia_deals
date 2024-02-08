@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, beforeSave, column } from '@ioc:Adonis/Lucid/Orm'
+import { v4 } from 'uuid'
 
-export default class RecommendationClientAccount extends BaseModel {
+export default class RecommendationAccount extends BaseModel {
   @column({ isPrimary: true })
   public id: string
 
@@ -16,5 +17,11 @@ export default class RecommendationClientAccount extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
    public updated_at: DateTime
+
+
+  @beforeSave()
+  public static async setUUID (transaction: RecommendationAccount) {
+    if(!transaction.id)transaction.id = v4()
+  }
 
 }

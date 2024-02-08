@@ -1,7 +1,7 @@
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import Database from "@ioc:Adonis/Lucid/Database";
-import RecommendationAccountProduct from "App/Models/RecommendationAccountProduct";
-import RecommendationClientAccount from "App/Models/RecommendationClientAccount";
+import RecommendationProduct from "App/Models/RecommendationProduct";
+import RecommendationAccount from "App/Models/RecommendationAccount";
 import Env from '@ioc:Adonis/Core/Env';
 import { v4 } from "uuid";
 
@@ -17,7 +17,7 @@ export default class RecommendationsController {
       if(!access.auth_table_id) return  "E_INVALID_API_TOKEN: Invalid API token"
       
       const id = v4();
-      const recommendation = await RecommendationAccountProduct.create({
+      const recommendation = await RecommendationProduct.create({
         product_id,
         my_account_id: access.auth_table_id,
         id
@@ -39,10 +39,10 @@ export default class RecommendationsController {
       const access = await auth.authenticate();
       if(!access.auth_table_id) return  "E_INVALID_API_TOKEN: Invalid API token"
       
-      const recommendations = await Database.from("recommendation_account_products")
+      const recommendations = await Database.from("recommendation_products")
       .select("*")
-      .select("recommendation_account_products.created_at as recommendation_created_at")
-      .select("recommendation_account_products.updated_at as recommendation_updated_at")
+      .select("recommendation_products.created_at as recommendation_created_at")
+      .select("recommendation_products.updated_at as recommendation_updated_at")
       .select("products.created_at as product_created_at")
       .select("products.updated_at as product_updated_at")
       .innerJoin("products", "products.id", "product_id")
@@ -60,7 +60,7 @@ export default class RecommendationsController {
       const access = await auth.authenticate();
       if(!access.auth_table_id) return  "E_INVALID_API_TOKEN: Invalid API token";
       
-      const recommendation = await RecommendationAccountProduct.find(id);
+      const recommendation = await RecommendationProduct.find(id);
       if(!recommendation) return  "ERROR recommendation not found";
       if(recommendation.my_account_id !== access.auth_table_id) return "ERROR permission denied"
       await recommendation.delete();
@@ -81,7 +81,7 @@ export default class RecommendationsController {
       if(!access.auth_table_id) return  "E_INVALID_API_TOKEN: Invalid API token"
 
       const id = v4();
-      const recommendation = await RecommendationClientAccount.create({
+      const recommendation = await RecommendationAccount.create({
         my_account_id: access.auth_table_id,
         other_account_id: account_id,
         id
@@ -103,13 +103,13 @@ export default class RecommendationsController {
       const access = await auth.authenticate();
       if(!access.auth_table_id) return  "E_INVALID_API_TOKEN: Invalid API token"
      
-      const recommendations = await Database.from("recommendation_client_accounts")
+      const recommendations = await Database.from("recommendation_accounts")
       .select("*")
-      .select("recommendation_client_accounts.created_at as recommendation_created_at")
-      .select("recommendation_client_accounts.updated_at as recommendation_updated_at")
+      .select("recommendation_accounts.created_at as recommendation_created_at")
+      .select("recommendation_accounts.updated_at as recommendation_updated_at")
       .select("accounts.created_at as account_created_at")
       .select("accounts.updated_at as account_updated_at")
-      .select("recommendation_client_accounts.id as id")
+      .select("recommendation_accounts.id as id")
       .innerJoin("accounts", "accounts.id", "other_account_id")
       .where("my_account_id",access.auth_table_id)
       .limit(limit)
@@ -125,7 +125,7 @@ export default class RecommendationsController {
       const access = await auth.authenticate();
       if(!access.auth_table_id) return  "E_INVALID_API_TOKEN: Invalid API token"
      
-      const recommendation = await RecommendationClientAccount.find(id)
+      const recommendation = await RecommendationAccount.find(id)
       if(!recommendation) return  "ERROR recommendation not found";
       if(recommendation.my_account_id !== access.auth_table_id) return "ERROR permission denied"
       await recommendation.delete();

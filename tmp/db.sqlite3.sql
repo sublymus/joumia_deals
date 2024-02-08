@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS "recommendation_account_product_receivers" (
 	"created_at"	datetime,
 	"updated_at"	datetime,
 	FOREIGN KEY("receiver_account_id") REFERENCES "accounts"("id"),
-	FOREIGN KEY("recommendation_id") REFERENCES "recommendation_account_products"("id")
+	FOREIGN KEY("recommendation_id") REFERENCES "recommendation_products"("id")
 );
 CREATE TABLE IF NOT EXISTS "recommendation_client_account_receivers" (
 	"recommendation_id"	char(36) NOT NULL,
@@ -156,7 +156,7 @@ CREATE TABLE IF NOT EXISTS "recommendation_client_accounts" (
 	FOREIGN KEY("other_account_id") REFERENCES "accounts"("id"),
 	FOREIGN KEY("my_account_id") REFERENCES "accounts"("id")
 );
-CREATE TABLE IF NOT EXISTS "recommendation_account_products" (
+CREATE TABLE IF NOT EXISTS "recommendation_products" (
 	"product_id"	char(36) NOT NULL,
 	"my_account_id"	char(36) NOT NULL,
 	"created_at"	datetime,
@@ -325,7 +325,7 @@ INSERT INTO "adonis_schema" VALUES (1,'database/migrations/1706781946085_account
  (12,'database/migrations/1706782414848_recommendation_account_product_receivers',1,'2024-02-07 17:52:00'),
  (13,'database/migrations/1706782441698_recommendation_client_account_receivers',1,'2024-02-07 17:52:00'),
  (14,'database/migrations/1706782455050_recommendation_client_accounts',1,'2024-02-07 17:52:00'),
- (15,'database/migrations/1706782464937_recommendation_account_products',1,'2024-02-07 17:52:00'),
+ (15,'database/migrations/1706782464937_recommendation_products',1,'2024-02-07 17:52:00'),
  (16,'database/migrations/1706782509104_votes',1,'2024-02-07 17:52:00'),
  (17,'database/migrations/1706782563488_products',1,'2024-02-07 17:52:01'),
  (18,'database/migrations/1706782595404_categories',1,'2024-02-07 17:52:01'),
@@ -347,7 +347,7 @@ INSERT INTO "recommendation_client_accounts" VALUES ('cb4fc999-5b66-4abc-a1a9-7e
  ('f582030a-be65-4a42-ae09-6e30eca1d6bf','f582030a-be65-4a42-ae09-6e30eca1d6bf','2024-02-08 11:03:55','2024-02-08 11:03:55'),
  ('cb4fc999-5b66-4abc-a1a9-7e7ea2f32a3b','f582030a-be65-4a42-ae09-6e30eca1d6bf','2024-02-08 11:05:04','2024-02-08 11:05:04'),
  ('cb4fc999-5b66-4abc-a1a9-7e7ea2f32a3b','f582030a-be65-4a42-ae09-6e30eca1d6bf','2024-02-08 11:22:33','2024-02-08 11:22:33');
-INSERT INTO "recommendation_account_products" VALUES ('962327b6-b851-4d3d-a94c-d3dbd72b7190','cb4fc999-5b66-4abc-a1a9-7e7ea2f32a3b','2024-02-08 10:41:01','2024-02-08 10:41:01'),
+INSERT INTO "recommendation_products" VALUES ('962327b6-b851-4d3d-a94c-d3dbd72b7190','cb4fc999-5b66-4abc-a1a9-7e7ea2f32a3b','2024-02-08 10:41:01','2024-02-08 10:41:01'),
  ('e95b5355-8d22-46e4-948c-c66fab5e9908','cb4fc999-5b66-4abc-a1a9-7e7ea2f32a3b','2024-02-08 10:41:33','2024-02-08 10:41:33'),
  ('3713d5b9-396a-4771-b3fb-d2198ef2f24a','cb4fc999-5b66-4abc-a1a9-7e7ea2f32a3b','2024-02-08 10:41:49','2024-02-08 10:41:49'),
  ('3713d5b9-396a-4771-b3fb-d2198ef2f24a','cb4fc999-5b66-4abc-a1a9-7e7ea2f32a3b','2024-02-08 11:34:03','2024-02-08 11:34:03'),
