@@ -3,9 +3,9 @@ import Database from "@ioc:Adonis/Lucid/Database";
 import Account from "App/Models/Account";
 import Category from "App/Models/Category";
 import Product from "App/Models/Product";
-// import env from "env";
 import { v4 } from "uuid";
 import CategoriesController from "./CategoriesController";
+import Env from '@ioc:Adonis/Core/Env';
 
 export default class ProductsController {
   public async create_product({ request, auth }: HttpContextContract) {
@@ -119,11 +119,11 @@ export default class ProductsController {
     if (page && page < 1) return " page must be between [1 ,n] ";
     if (limit && limit < 1) return " limite must be between [1 ,n] ";
     page = page ?? 1;
-    limit = limit ?? 25; //TODO use env.default_limit
+    limit = limit??Env.get('DEFAULT_LIMIT')
 
     let query = Product.query()
       .select("*")
-      // .where("status", PRODUCT_STATUS.VALID); //TODO product.valid
+      // .where("status", Product.STATUS.VALID); //TODO product.valid
 
     if (provider_id) {
       query = query.where("account_id", provider_id);

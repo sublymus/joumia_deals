@@ -7,7 +7,7 @@
  FRONT_END 
  ```jsx
 * PAGE_AUTH 
-
+ 
 
 PAGE_EDIT_MY_PROFILE
 *PAGE_MY_PROFILE
@@ -91,6 +91,7 @@ ROUTE_ACTION_USER ( recommendation @ , visited @, favorites , report )
 VALIDATION
 PERMISSION
 ERROR
+MIN_MAX
 
 ROUTE_TRANSATION
 

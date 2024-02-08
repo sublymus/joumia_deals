@@ -5,6 +5,7 @@ export default class extends BaseSchema {
 
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
+      table.uuid('id').primary()
       table.uuid('product_id').notNullable().references('id').inTable('products')
       table.uuid('account_id').notNullable().references('id').inTable('accounts')
       table.timestamp('created_at', { useTz: true })
