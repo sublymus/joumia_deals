@@ -71,7 +71,7 @@ Route.get('/get_favorite_products','FavoritesController.get_favorite_products');
 Route.delete('/delete_favorite_account','FavoritesController.delete_favorite_account');
 Route.delete('/delete_favorite_product','FavoritesController.delete_favorite_product');
 
-Route.get('/try_token',()=>{
+Route.post('/try_token',()=>{
     return {
         valid :true
     }

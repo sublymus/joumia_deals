@@ -7,7 +7,6 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().notNullable()
       table.text('title').notNullable();
-      table.text('subtitle').notNullable();
       table.integer('price').notNullable();
       table.text('description').notNullable();
       table.smallint('status').notNullable();

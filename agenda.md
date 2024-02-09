@@ -39,19 +39,15 @@ ROUTE = 'creation de route +  creation du test'
 
 # ROUTE_AUTH
 ##  connexion
-    access : any / status : end  /
 ##  create user
-    access : any / status : end  /
 ##  deconnexion
-    access : any / status : end  /
+  
 
 # EDIT_PROFILE
 ##  me
-    access : any / status : end  /
 ##  edite_me
 ##  get_account 
 ##  get_account_from_ids
-    accounnt_filter_filter
 
 # ROUTE PRODUCT
 ##  create_product
@@ -59,9 +55,9 @@ ROUTE = 'creation de route +  creation du test'
 ##  update_product
 ##  delete_product
 ##  get_product_from_ids
+##  filter_product 
     valid_product
     reject_product
-    products_filter 
 
 # ROUTE CGATEGORY  
 ##  create_category
@@ -81,6 +77,30 @@ ROUTE = 'creation de route +  creation du test'
 ##  change_moderator_key
     moderator_filter
 
+# ROUTE_ACTION_USER
+##  report
+##  favorites
+##  recommendation
+    link
+    visited
+
+MIN_MAX
+
+file_manage
+
+VALIDATION
+
+ROUTE_ADMIN
+
+RULES ACL
+PERMISSION
+
+ROUTE_MESSENGER
+ROUTE_VOTE
+
+ERROR
+
+inFavorite
 
 // db.inserte('account')
 // db.inserte('category')
@@ -90,18 +110,6 @@ ROUTE = 'creation de route +  creation du test'
 // db.inserte('favorites')
 // db.inserte('visited')
 
-ROUTE_ADMIN
-
-ROUTE_MESSENGER
-ROUTE_VOTE
-
-ROUTE_ACTION_USER ( recommendation @ , visited @, favorites , report )
-
-VALIDATION
-PERMISSION
-ERROR
-MIN_MAX
-
 ROUTE_TRANSATION
 
 DOKER_IMAGE
@@ -110,8 +118,8 @@ HOSTINGER_PROD
 TEST_PROD
 
 
-
-
+follow
+use whatsapp 
 
 edit profile => page
 

@@ -11,7 +11,6 @@ export default class ProductsController {
   public async create_product({ request, auth }: HttpContextContract) {
     const {
       title,
-      subtitle,
       description,
       price,
       category_id,
@@ -21,7 +20,6 @@ export default class ProductsController {
 
     if (
       !title ||
-      !subtitle ||
       !description ||
       !price ||
       !caracteristique ||
@@ -42,7 +40,6 @@ export default class ProductsController {
     const product = await Product.create({
       id,
       title,
-      subtitle,
       description,
       price,
       caracteristique,
@@ -63,7 +60,6 @@ export default class ProductsController {
   public async update_product({ request }: HttpContextContract) {
     const attributes = [
       "title",
-      "subtitle",
       "description",
       "price",
       "category_id",
@@ -136,7 +132,6 @@ export default class ProductsController {
       const regex = `%${text.split("").join("%")}%`;
       query = query.andWhere((q) => {
         q.whereLike("title", regex)
-          .orWhereLike("subtitle", regex)
           .orWhereLike("description", regex);
       });
     }

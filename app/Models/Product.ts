@@ -13,9 +13,6 @@ export default class Product extends BaseModel {
   @column()
   public title: string
 
-  @column()
-  public subtitle: string
-
   @column.dateTime({ autoCreate: true })
   public express_time: DateTime
 
