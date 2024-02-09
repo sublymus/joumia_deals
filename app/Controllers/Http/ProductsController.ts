@@ -5,27 +5,21 @@ import Category from "App/Models/Category";
 import Product from "App/Models/Product";
 import { v4 } from "uuid";
 import CategoriesController from "./CategoriesController";
-import Env from '@ioc:Adonis/Core/Env';
-
+import Env from "@ioc:Adonis/Core/Env";
+import { createFile, updateFile } from "./Tools/FilesManager";
 export default class ProductsController {
   public async create_product({ request, auth }: HttpContextContract) {
-    const {
-      title,
-      description,
-      price,
-      category_id,
-      caracteristique,
-    } = request.body();
+    const { title, description, price, category_id, caracteristique } =
+      request.body();
     //    console.log({ label, caracteristique_field, last_appearance,parent_product_id, is_parentable });
 
-    if (
-      !title ||
-      !description ||
-      !price ||
-      !caracteristique ||
-      !category_id
-    ) {
+    if (!title || !description || !price || !caracteristique || !category_id) {
       return "ERROR field required : { title,sub_title,description,price,category_id,caracteristique,}";
+    }
+
+    const photos = request.files("photos");
+    if (!(photos.length > 0)) {
+      return "ERROR field required : files photos ";
     }
 
     const category = await Category.findOrFail(category_id);
@@ -37,22 +31,29 @@ export default class ProductsController {
     if (!account) {
       return "ERROR CONNEXION REQUIRED";
     }
+
+    const photosUrl = await createFile(photos, id);
     const product = await Product.create({
       id,
       title,
       description,
       price,
-      caracteristique,
+      caracteristique: JSON.stringify(caracteristique),
       status: Product.STATUS.AWAIT,
       account_id: account.id,
       category_id,
+      photos: JSON.stringify(photosUrl),
       // express_time:'',
       // last_appearance:'',
       // moderator_id:''
     });
+
+    console.log({ photosUrl });
+
     return {
       ...product.$attributes,
       provider: Account.formatAccount(account),
+      photos: photosUrl,
       id,
     };
   }
@@ -65,6 +66,7 @@ export default class ProductsController {
       "category_id",
       "caracteristique",
     ];
+    const filesAttributes = ["photos"];
     const body = request.body();
 
     if (!body.id) return 'ERROR required => "id"';
@@ -73,10 +75,30 @@ export default class ProductsController {
       const category = await Category.find(body.category_id);
       if (!category) return "ERROR category not found";
     }
+
+    const files = request.files(filesAttributes[0]);
+
+   
     const product = await Product.findByOrFail("id", body.id);
+
+    if (!product) {
+      return "ERROR Product not found";
+    }
     attributes.forEach((attribute) => {
       if (body[attribute]) product[attribute] = body[attribute];
     });
+    let urls :string[]; 
+    for (const filesAttribute of filesAttributes) {
+      urls = await updateFile({
+        files,
+        filesAttribute,
+        lastUrls:product[filesAttribute],
+        newPseudoUrls:body[filesAttribute],
+        tableId:body.id
+      })
+      product[filesAttribute] = JSON.stringify(urls);
+    }
+   
     await product.save();
     const account = await Account.findOrFail(product.account_id);
     return {
@@ -97,7 +119,6 @@ export default class ProductsController {
     };
   }
 
-
   public async filter_product({ request }: HttpContextContract) {
     let { provider_id, page, limit, filter } = request.body() as {
       provider_id?: string;
@@ -115,11 +136,10 @@ export default class ProductsController {
     if (page && page < 1) return " page must be between [1 ,n] ";
     if (limit && limit < 1) return " limite must be between [1 ,n] ";
     page = page ?? 1;
-    limit = limit??Env.get('DEFAULT_LIMIT')
+    limit = limit ?? Env.get("DEFAULT_LIMIT");
 
-    let query = Product.query()
-      .select("*")
-      // .where("status", Product.STATUS.VALID); //TODO product.valid
+    let query = Product.query().select("*");
+    // .where("status", Product.STATUS.VALID); //TODO product.valid
 
     if (provider_id) {
       query = query.where("account_id", provider_id);
@@ -131,15 +151,17 @@ export default class ProductsController {
       const text = filter.text;
       const regex = `%${text.split("").join("%")}%`;
       query = query.andWhere((q) => {
-        q.whereLike("title", regex)
-          .orWhereLike("description", regex);
+        q.whereLike("title", regex).orWhereLike("description", regex);
       });
     }
 
-    if (filter && (filter.category_id!==undefined || filter.category_id === null)) {
+    if (
+      filter &&
+      (filter.category_id !== undefined || filter.category_id === null)
+    ) {
       const list = [filter.category_id];
-      await CategoriesController.allChildren(filter.category_id,list)
-      console.log({list});
+      await CategoriesController.allChildren(filter.category_id, list);
+      console.log({ list });
       query = query.andWhereIn("category_id", list);
     }
 

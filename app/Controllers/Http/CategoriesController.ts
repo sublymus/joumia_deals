@@ -123,7 +123,7 @@ export default class CategoriesController {
     if (!id) return 'ERROR required => "id"';
     await (await Category.find(id))?.delete();
     return {
-      isDeleted: !(await Category.find(id)),
+      isDeleted:true
     };
   }
 }

@@ -21,6 +21,16 @@ PAGE_MAIN (  COMP_CATEGORY , COMP_FILTER , COM_PRODUCT )
 NAV_FILTER 
 
 
+edit profile => page
+
+notificaton  => page
+
+messagerie => page
+
+paramerte => page
+
+mes annone , recommendation , visited , favorites , report 
+
 SUB_PAGE_FAVORITES
 SUB_PAGE_HISTORY ( my_annonce, recommendation(product / account {view , clik}) ,visited_product (15) , visited_account (15)   )
 
@@ -64,6 +74,7 @@ ROUTE = 'creation de route +  creation du test'
 ##  get_groduct
 ##  update_category
 ##  delete_category
+cascad
 ##  get_category_from_ids
 ##  categories_filter
 
@@ -84,19 +95,28 @@ ROUTE = 'creation de route +  creation du test'
     link
     visited
 
-MIN_MAX
+1 / file_manage
 
-file_manage
+2 / VALIDATION
 
-VALIDATION
+3 / ROUTE_MESSENGER
+
+4 / ROUTE_VOTE
+
+5 / follow
+
+6 / use whatsapp 
+
+
+MIN_MAX (le strict minimux pour le produit)
 
 ROUTE_ADMIN
 
+
 RULES ACL
+
 PERMISSION
 
-ROUTE_MESSENGER
-ROUTE_VOTE
 
 ERROR
 
@@ -118,102 +138,18 @@ HOSTINGER_PROD
 TEST_PROD
 
 
-follow
-use whatsapp 
-
-edit profile => page
-
-notificaton  => page
-
-messagerie => page
-
-paramerte => page
-
-mes annone , recommendation , visited , favorites , report 
-
-++++++++++++++++++++++++++++++++++++++++++
-
-++++++++++++++++++++++++++++++++++++++++++
-
-++++++++++++++++++++++++++++++++++++++++++
-
-++++++++++++++++++++++++++++++++++++++++++
-
-++++++++++++++++++++++++++++++++++++++++++
-            1  ,  2 ,  3 ,  4 ->
-_______________________________________________________________
-
-recommendation
-
-++++++  ++++++++  ++++++   +++++++
-
-visited
- 
-++++++  ++++++++  ++++++   +++++++
-
-favorites
-  
-++++++  ++++++++  ++++++   +++++++
-
-report
-
-++++++  ++++++++  ++++++   +++++++
-```json
-[{ 
-    "type":"string",
-    "name": "noga",
-    "placeholder": "by ng",
-    "field":"textarea",
-    "require":true,
-   // "default":"string",
-    "icon":"url",
-    //"lowercase" : true,
-    "uppercase":true,
-    "capitalize":true,
-    "trim":true,
-    "match":["regexString","i"],
-    "enum":["azerty","piokioulou"],
-    "minLength":10,
-    "maxLength":100
-},{
-    "type":"booean",
-    "name": "isValid",
-    "placeholder": "is Valid product",
-    "field":"input",
-    "require":true,
-    "default":false,
-    "icon":"url"
-},{
-    "type":"number",
-    "name": "volume",
-    "placeholder": "Volume",
-    "field":"input",
-    "require":true,
-    "default":30,
-    "icon":"url",
-    "enum":[30,50,75],
-    "min":30,
-    "max":75 
-},{
-    "type":"date",
-    "name": "date d'acquisition",
-    "placeholder": "yyyy-mm-dd",
-    "field":"input",
-    "require":true,
-    "default":"2024-02-05",
-    "icon":"url",
-    //"enum":["2024-02-05","2024-02-06"..],
-    "min":"2024-02-01",
-    "max":"2024-02-14" 
-},{
-    "type":"files",
-    "name": "piscture",
-    "placeholder": "picture",
-    "field":"input",
-    "require":true,
-    "min":1,
-    "max":100,
-    "maxSize":1000000,
-    "mime":["image/png",["video/mp4",12000000]]
-}]
-```
+type FieldOptions = {
+  type: 'string' | 'number' | 'boolean' | 'date' | 'files';
+  name: string;
+  placeholder?: string;
+  field: HTMLInputTypeAttribute;
+  require?: boolean;
+  default?: string;
+  icon: string;
+  match?: [string, string]; // regexString, i
+  enum?: (string[] | number[]);
+  min?: number;
+  max?: number;
+  maxSize?: number;
+  mime?: (string | [string, number])[];
+}[];

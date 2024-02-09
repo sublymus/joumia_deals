@@ -10,6 +10,7 @@ export default class extends BaseSchema {
       table.integer('price').notNullable();
       table.text('description').notNullable();
       table.smallint('status').notNullable();
+      table.json('photos').notNullable();
       table.timestamp('express_time', { useTz: true })
       table.timestamp('last_appearance', { useTz: true })
       table.json('caracteristique');

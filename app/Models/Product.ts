@@ -13,10 +13,10 @@ export default class Product extends BaseModel {
   @column()
   public title: string
 
-  @column.dateTime({ autoCreate: true })
+  @column.dateTime()
   public express_time: DateTime
 
-  @column.dateTime({ autoCreate: true })
+  @column.dateTime()
   public last_appearance: DateTime
 
   @column()
@@ -30,6 +30,9 @@ export default class Product extends BaseModel {
 
   @column()
   public price: number
+
+  @column()
+  public photos: string
 
   @column()
   public category_id: string
