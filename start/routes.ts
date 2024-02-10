@@ -21,7 +21,7 @@
 import { HttpContext } from '@adonisjs/core/build/standalone';
 import Route from '@ioc:Adonis/Core/Route'
 import Env from '@ioc:Adonis/Core/Env';
-// import env from '../env';
+import './validator';
 
 Route.get('/google_connexion','AuthController.google_connexion');
 Route.get('/gl_push_info','AuthController.google_push_info');
@@ -80,5 +80,3 @@ Route.get('/try_token',()=>{
 Route.post('/',({response}:HttpContext)=>{
     response.redirect().toPath(`${Env.get('FRONT_ORIGINE')}`)
 });
-
-

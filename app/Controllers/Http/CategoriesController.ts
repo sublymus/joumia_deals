@@ -27,16 +27,21 @@ export default class CategoriesController {
   public async update_category({ request }: HttpContextContract) {
     const attributes = [
       "label",
-      "caracteristique_field",
       "parent_category_id",
       "is_parentable",
     ];
+    const jsonAttributes = [
+      "caracteristique_field"
+    ]
     const body = request.body();
 
     if (!body.id) return 'ERROR required => "id"';
     const category = await Category.findByOrFail("id", body.id);
     attributes.forEach((attribute) => {
       if (body[attribute]) category[attribute] = body[attribute];
+    });  
+    jsonAttributes.forEach((attribute) => {
+      if (body[attribute]) category[attribute] = JSON.stringify(body[attribute]);
     });
     await category.save();
     return category.$attributes;
@@ -103,9 +108,9 @@ export default class CategoriesController {
     }
   }
 
-  public async get_category_parents({ request }: HttpContextContract) {
-    let { id } = request.body();
-    if (!id) return 'ERROR required => "id"';
+  public static async parentList(id:string){
+    
+    if (!id) return null;
     const categories: any[] = [];
     while (true) {
       const category = await Category.find(id);
@@ -116,7 +121,13 @@ export default class CategoriesController {
         break;
       }
     }
-    return categories;
+    return categories
+  }
+
+  public async get_category_parents({ request }: HttpContextContract) {
+    let { id } = request.body();
+   
+    return await CategoriesController.parentList(id);
   }
   public async delete_category({ request }: HttpContextContract) {
     const { id } = request.body();

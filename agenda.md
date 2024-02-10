@@ -95,28 +95,26 @@ cascad
     link
     visited
 
-1 / file_manage
+# #ile_manage
+## ceateFile()
+## updateFile()
 
-2 / VALIDATION
+6 / use whatsapp 
+
+ VALIDATION
 
 3 / ROUTE_MESSENGER
 
 4 / ROUTE_VOTE
 
-5 / follow
-
-6 / use whatsapp 
-
-
 MIN_MAX (le strict minimux pour le produit)
 
 ROUTE_ADMIN
-
-
+ROUTE_MEDRATOR
 RULES ACL
-
 PERMISSION
 
+<!-- 5 / follow -->
 
 ERROR
 
@@ -141,6 +139,7 @@ TEST_PROD
 type FieldOptions = {
   type: 'string' | 'number' | 'boolean' | 'date' | 'files';
   name: string;
+  label: string,
   placeholder?: string;
   field: HTMLInputTypeAttribute;
   require?: boolean;

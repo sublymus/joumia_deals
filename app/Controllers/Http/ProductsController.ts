@@ -7,11 +7,11 @@ import { v4 } from "uuid";
 import CategoriesController from "./CategoriesController";
 import Env from "@ioc:Adonis/Core/Env";
 import { createFile, updateFile } from "./Tools/FilesManager";
+import {create_product_validator} from "App/Validators/ProductValidator";
 export default class ProductsController {
-  public async create_product({ request, auth }: HttpContextContract) {
-    const { title, description, price, category_id, caracteristique } =
-      request.body();
-    //    console.log({ label, caracteristique_field, last_appearance,parent_product_id, is_parentable });
+  public async create_product(ctx: HttpContextContract) {
+    const {request,auth} = ctx;
+    const { title, description, price, category_id, caracteristique } = await request.validate({ schema: create_product_validator })
 
     if (!title || !description || !price || !caracteristique || !category_id) {
       return "ERROR field required : { title,sub_title,description,price,category_id,caracteristique,}";
