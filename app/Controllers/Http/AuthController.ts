@@ -83,6 +83,7 @@ export default class AuthController {
             phone: null,
             location: null,
             name: name,
+            use_whatsapp:false,
             email,
             avatar_url,
             oauth_client_id: access.password,
@@ -104,6 +105,7 @@ export default class AuthController {
         phone: null,
         location: null,
         name: name,
+        use_whatsapp:false,
         email,
         avatar_url,
         oauth_client_id: acces_oauth.password,
@@ -119,6 +121,7 @@ export default class AuthController {
       avatar_url,
       location,
       email,
+      use_whatsapp,
       oauth_client_id,
       oauth_provider_name,
     } = request.all();
@@ -162,6 +165,7 @@ export default class AuthController {
         phone,
         avatar_url: avatar_url,
         email,
+        use_whatsapp:!!use_whatsapp,
         location,
         access_id: myAccess.id,
       });

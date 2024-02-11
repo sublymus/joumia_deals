@@ -12,7 +12,11 @@ export default class Account extends BaseModel {
 
   @column()
   public location: string;
-
+  
+  
+  @column()
+  public use_whatsapp : boolean;
+  
   @column()
   public email: string;
 

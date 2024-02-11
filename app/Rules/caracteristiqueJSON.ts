@@ -1,9 +1,12 @@
-import { rules, schema, validator } from "@ioc:Adonis/Core/Validator";
+import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
+import {  validator } from "@ioc:Adonis/Core/Validator";
 import CategoriesController from "App/Controllers/Http/CategoriesController";
-console.log("##");
+import Product from "App/Models/Product";
+
+
 
 type FieldOptions = {
-  type: "string" | "number" | "boolean" | "date" | "files";
+  type: "string" | "number" | "boolean" | "date" | "file";
   name: string;
   field: string;
   placeholder?: string;
@@ -21,8 +24,9 @@ type FieldOptions = {
 function isString(a: any): a is Array<string> {
   return typeof a?.[0] == "string";
 }
-function isNumber(a: Array<any>): a is Array<number> {
-  return typeof a?.[0] == "number";
+
+function isNumber(a: any): a is number {
+  return !Number.isNaN(Number(a))
 }
 function isDate(a: any): a is string {
   try {
@@ -38,18 +42,25 @@ function isDate(a: any): a is string {
   return true;
 }
 validator.rule("caracteristiqueJson", async (value, o, options) => {
-  console.log({ value, o, root: options.root });
+//   console.log({ value, o, root: options.root });
+  // console.log('options.field',options.field);
+//   console.log('options',options);
+  
+  // console.log('options.pointer',options.pointer);
 
   const { root } = options;
-
   let caracteristique: { [k: string]: string | number } = {};
   try {
     caracteristique = JSON.parse(root.caracteristique);
-
-    const categories = await CategoriesController.parentList(root.category_id);
-
+    let category_id :string ='';
+    if(root.category_id){
+      category_id = root.category_id;
+    }else if(root.id){
+      const product = await Product.find(root.id);
+      category_id = product?.category_id||'';
+    }
+    const categories = await CategoriesController.parentList(category_id);
     if (!categories || categories.length <= 0) {
-      console.log("@@@@@@@@@", categories);
       throw new Error("category_id not found");
     }
 
@@ -65,9 +76,7 @@ validator.rule("caracteristiqueJson", async (value, o, options) => {
       })
       .flat(1);
 
-    console.log("##########", fields.length);
-
-    validFields(fields, caracteristique);
+    validFields(fields, caracteristique, root.caracteristique_files);
   } catch (error) {
     console.error(error.message);
 
@@ -77,32 +86,26 @@ validator.rule("caracteristiqueJson", async (value, o, options) => {
       error.message
     );
   }
-});
-validator.rule("json", async (value, o, options) => {
-  const { root } = options;
+},() => ({
+    allowUndefineds: true,
+  }));
 
+function getArrayJSON(value : any){
   try {
-    JSON.parse(root.caracteristique);
-  } catch (error) {}
-
-  // // Rest of the validation
-  // if (maxLength && value.length > maxLength) {
-  //   options.errorReporter.report(
-  //     options.pointer,
-  //     'camelCase.maxLength', // 👈 Keep an eye on this
-  //     'camelCase.maxLength validation failed',
-  //     options.arrayExpressionPointer,
-  //     { maxLength }
-  //   )
-  // }
-});
+    const v = JSON.parse(value) 
+    return Array.isArray(v)?v:null;
+  } catch (error) {
+    return null
+  }
+}
 
 function validField(
   rule: FieldOptions[0],
-  caracteristique: { [k: string]: string | number }
+  caracteristique: { [k: string]: string | number },
+  caracteristique_files:ReturnType<HttpContextContract["request"]["files"]>
 ) {
   let value = caracteristique[rule.name];
-  console.log({ value, name: rule.name, type: rule.type });
+//   console.log({ value, name: rule.name, type: rule.type });
 
   if (value != undefined) {
     if (rule.type == "string") {
@@ -123,7 +126,7 @@ function validField(
           throw new Error(
             `ERROR ${rule.name}:${value},  must be a value > ${rule.min}`
           );
-        if (rule.match && new RegExp(rule.match[0], rule.match[1]).test(value))
+        if (rule.match && !(new RegExp(rule.match[0], rule.match[1]).test(value)))
           throw new Error(
             `ERROR ${rule.name}:${value},  regExp no match : ${rule.match}`
           );
@@ -168,19 +171,26 @@ function validField(
             ).toDateString()}`
           );
       }
-    } else if (rule.type == "boolean" && typeof value !== "boolean")
-      throw new Error(
+    } else if (rule.type == "boolean"){
+      if(typeof value !== "boolean")throw new Error(
         `'ERROR caracteristique.${rule.name} must be a boolean value`
       );
+    }else if (rule.type == 'file'){
+      const v = getArrayJSON(value)
+     if(!v) throw new Error(`ERROR ${rule.name}:${value},  must be an Array like : ['carateristique_files.n',..] where n is index number`);
+     
+    }
   } else {
     if (rule.require == true) throw new Error("ERROR require " + rule.name);
   }
 }
 function validFields(
   fields: FieldOptions,
-  caracteristique: { [k: string]: string | number }
+  caracteristique: { [k: string]: string | number },
+  caracteristique_files:ReturnType<HttpContextContract["request"]["files"]>
 ) {
   for (const rule of fields) {
-    validField(rule, caracteristique);
+    
+    validField(rule, caracteristique, caracteristique_files);
   }
 }

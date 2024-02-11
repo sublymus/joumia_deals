@@ -11,7 +11,7 @@ export default class AccountsController {
   }
 
   public async edit_me({ auth, request }: HttpContextContract) {
-    const attributes = ["phone", "name", "location", "avatar_url"];
+    const attributes = ["phone", "name", "location", "avatar_url","use_whatsapp"];
     const body = request.body();
 
     const account = await Account.getAccountByAuth(auth);

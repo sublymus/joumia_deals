@@ -9,6 +9,7 @@ export default class extends BaseSchema {
       table.string('name',30).notNullable();
       table.text('location').notNullable();
       table.text('email').notNullable().unique();
+      table.boolean('use_whatsapp').notNullable();
       table.text('avatar_url')
       table.text('access_id').notNullable();
       table.text('phone').notNullable();

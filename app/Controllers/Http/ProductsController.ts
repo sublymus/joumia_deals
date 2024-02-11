@@ -7,7 +7,8 @@ import { v4 } from "uuid";
 import CategoriesController from "./CategoriesController";
 import Env from "@ioc:Adonis/Core/Env";
 import { createFile, updateFile } from "./Tools/FilesManager";
-import {create_product_validator} from "App/Validators/ProductValidator";
+import {create_product_validator, update_product_validator} from "App/Validators/ProductValidator";
+import { logger } from "Config/app";
 export default class ProductsController {
   public async create_product(ctx: HttpContextContract) {
     const {request,auth} = ctx;
@@ -67,18 +68,18 @@ export default class ProductsController {
       "caracteristique",
     ];
     const filesAttributes = ["photos"];
-    const body = request.body();
+    const body = request.body(); //await request.validate({ schema: update_product_validator})
+    console.log('^^^^^^^^^^^^^',request.body());
 
-    if (!body.id) return 'ERROR required => "id"';
-    if (body.category_id) {
-      //TODO trouver solution pour capturer l'error au lieu de trouver la cat..
-      const category = await Category.find(body.category_id);
-      if (!category) return "ERROR category not found";
-    }
+    // if (body.category_id) {
+    //   //TODO trouver solution pour capturer l'error au lieu de trouver la cat..
+    //   const category = await Category.find(body.category_id);
+    //   if (!category) return "ERROR category not found";
+    // }
 
-    const files = request.files(filesAttributes[0]);
-
-   
+ 
+    
+    
     const product = await Product.findByOrFail("id", body.id);
 
     if (!product) {
@@ -88,7 +89,9 @@ export default class ProductsController {
       if (body[attribute]) product[attribute] = body[attribute];
     });
     let urls :string[]; 
+    const returnFiles = {}
     for (const filesAttribute of filesAttributes) {
+      const files = request.files(filesAttribute);
       urls = await updateFile({
         files,
         filesAttribute,
@@ -97,6 +100,7 @@ export default class ProductsController {
         tableId:body.id
       })
       product[filesAttribute] = JSON.stringify(urls);
+      returnFiles[filesAttribute] = urls
     }
    
     await product.save();
@@ -104,6 +108,7 @@ export default class ProductsController {
     return {
       ...product.$attributes,
       provider: Account.formatAccount(account),
+   //   ...returnFiles
     };
   }
 
@@ -215,6 +220,7 @@ export default class ProductsController {
       "access_id",
       "acl_id",
       "phone",
+      "use_whatsapp",
       "acreated_at",
       "aupdated_at",
     ];

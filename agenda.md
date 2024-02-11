@@ -99,12 +99,20 @@ cascad
 ## ceateFile()
 ## updateFile()
 
-6 / use whatsapp 
+* / use whatsapp 
 
- VALIDATION
+Account_VALIDATION
+admin_VALIDATION
+auth_VALIDATION
+categories_VALIDATION
+favorites_VALIDATION
+Messenger_VALIDATION
+Moderator_VALIDATION
+Product_VALIDATION
+Recommendation_VALIDATION
+Reports_VALIDATION
 
 3 / ROUTE_MESSENGER
-
 4 / ROUTE_VOTE
 
 MIN_MAX (le strict minimux pour le produit)
@@ -135,6 +143,7 @@ TEST_VERCEL
 HOSTINGER_PROD
 TEST_PROD
 
+resize image
 
 type FieldOptions = {
   type: 'string' | 'number' | 'boolean' | 'date' | 'files';
