@@ -2,16 +2,16 @@ import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import Database from "@ioc:Adonis/Lucid/Database";
 import RecommendationProduct from "App/Models/RecommendationProduct";
 import RecommendationAccount from "App/Models/RecommendationAccount";
-import Env from '@ioc:Adonis/Core/Env';
 import { v4 } from "uuid";
+import { add_recommendation_account_validator, add_recommendation_product_validator, delete_recommendation_account_validator, delete_recommendation_product_validator, get_account_recommendations_validator, get_product_recommendations_validator } from "App/Validators/RecommendationsValidator";
+import { paginate } from "./Tools/Utils";
 
 export default class RecommendationsController {
     public async add_recommendation_product({
       request,
       auth,
     }: HttpContextContract) {
-      const { id: product_id } = request.body();
-      if (!product_id) return 'ERROR required => "id"';
+      const { product_id } = await request.validate(add_recommendation_product_validator);
       
       const access = await auth.authenticate();
       if(!access.auth_table_id) return  "E_INVALID_API_TOKEN: Invalid API token"
@@ -30,14 +30,9 @@ export default class RecommendationsController {
     }
 
     public async get_product_recommendations({ request, auth }: HttpContextContract) {
-      let { limit, page } = request.body();
-      if (page < 1) return " page must be between [1 ,n] ";
-      if (limit < 1) return " limit must be between [1 ,n] ";
-      page = page??1;
-      limit = limit??Env.get('DEFAULT_LIMIT')
-
+      let { limit, page } = paginate(await request.validate(get_product_recommendations_validator))
+      
       const access = await auth.authenticate();
-      if(!access.auth_table_id) return  "E_INVALID_API_TOKEN: Invalid API token"
       
       const recommendations = await Database.from("recommendation_products")
       .select("*")
@@ -54,13 +49,11 @@ export default class RecommendationsController {
     }
   
     public async delete_recommendation_product({ request, auth }: HttpContextContract) {
-      const { id } = request.body();
-      if (!id) return 'ERROR required => "id"';
+      const { product_id } = await request.validate(delete_recommendation_product_validator);
       
       const access = await auth.authenticate();
-      if(!access.auth_table_id) return  "E_INVALID_API_TOKEN: Invalid API token";
       
-      const recommendation = await RecommendationProduct.find(id);
+      const recommendation = await RecommendationProduct.find(product_id);
       if(!recommendation) return  "ERROR recommendation not found";
       if(recommendation.my_account_id !== access.auth_table_id) return "ERROR permission denied"
       await recommendation.delete();
@@ -74,11 +67,9 @@ export default class RecommendationsController {
       request,
       auth,
     }: HttpContextContract) {
-      const { id: account_id } = request.body();
-      if (!account_id) return 'ERROR required => "id"';
+      const { account_id } = await request.validate(add_recommendation_account_validator);
       
       const access = await auth.authenticate();
-      if(!access.auth_table_id) return  "E_INVALID_API_TOKEN: Invalid API token"
 
       const id = v4();
       const recommendation = await RecommendationAccount.create({
@@ -94,14 +85,9 @@ export default class RecommendationsController {
     }
 
     public async get_account_recommendations({ request, auth }: HttpContextContract) {
-      let { limit, page } = request.body();
-      if (page < 1) return " page must be between [1 ,n] ";
-      if (limit < 1) return " limit must be between [1 ,n] ";
-      page = page??1;
-      limit = limit??Env.get('DEFAULT_LIMIT')
+      let { limit, page } =paginate( await request.validate(get_account_recommendations_validator));
      
       const access = await auth.authenticate();
-      if(!access.auth_table_id) return  "E_INVALID_API_TOKEN: Invalid API token"
      
       const recommendations = await Database.from("recommendation_accounts")
       .select("*")
@@ -119,13 +105,11 @@ export default class RecommendationsController {
     }
   
     public async delete_recommendation_account({ request, auth }: HttpContextContract) {
-      const { id } = request.body();
-      if (!id) return 'ERROR required => "id"';
-     
+      const { account_id } = await request.validate(delete_recommendation_account_validator);
+
       const access = await auth.authenticate();
-      if(!access.auth_table_id) return  "E_INVALID_API_TOKEN: Invalid API token"
-     
-      const recommendation = await RecommendationAccount.find(id)
+
+      const recommendation = await RecommendationAccount.find(account_id)
       if(!recommendation) return  "ERROR recommendation not found";
       if(recommendation.my_account_id !== access.auth_table_id) return "ERROR permission denied"
       await recommendation.delete();

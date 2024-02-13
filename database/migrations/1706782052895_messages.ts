@@ -7,6 +7,7 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().notNullable()
       table.text('text');
+      table.string('files');
       table.uuid('group_id').references('id').inTable('groups').notNullable();
       table.uuid('account_id').references('id').inTable('accounts').notNullable();
       table.timestamp('created_at', { useTz: true })

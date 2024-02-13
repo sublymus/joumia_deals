@@ -44,9 +44,10 @@ export default class Account extends BaseModel {
   }
   public static async getAccountByAuth(auth: HttpContextContract["auth"]) {
     const access = await auth.authenticate();
-
-    if (!access) return null;
-    return await Account.find(access.auth_table_id);
+    const account = await Account.find(access.auth_table_id);
+    if(!account)
+    throw new Error("ERROR CONNEXION REQUIRED")
+    return account
   }
 
   public static  formatAccount(account: Account) {

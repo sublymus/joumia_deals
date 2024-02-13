@@ -1,8 +1,6 @@
 import { DateTime } from 'luxon'
 import {v4} from 'uuid'
-import { BaseModel, HasOne, beforeSave, column, hasOne } from '@ioc:Adonis/Lucid/Orm'
-import Group from './Group'
-import Account from './Account'
+import { BaseModel, beforeSave, column } from '@ioc:Adonis/Lucid/Orm'
 
 export default class Message extends BaseModel {
   @column({ isPrimary: true })
@@ -10,12 +8,15 @@ export default class Message extends BaseModel {
   
   @column()
   public text: string
+  
+  @column()
+  public group_id:  string
 
-  @hasOne(()=>Group)
-  public group_id:  HasOne<typeof Group>
+  @column()
+  public files:  string
 
-  @hasOne(()=>Account)
-  public account_id:  HasOne<typeof Account>
+  @column()
+  public account_id:  string
 
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime

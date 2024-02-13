@@ -4,42 +4,40 @@ import Account from "App/Models/Account";
 import Category from "App/Models/Category";
 import Product from "App/Models/Product";
 import { v4 } from "uuid";
-import CategoriesController from "./CategoriesController";
-import Env from "@ioc:Adonis/Core/Env";
-import { createFile, updateFile } from "./Tools/FilesManager";
-import {create_product_validator, update_product_validator} from "App/Validators/ProductValidator";
-import { logger } from "Config/app";
-export default class ProductsController {
-  public async create_product(ctx: HttpContextContract) {
-    const {request,auth} = ctx;
-    const { title, description, price, category_id, caracteristique } = await request.validate({ schema: create_product_validator })
+import { createFiles, updateFiles } from "./Tools/FilesManager";
+import {create_product_validator, filter_product_validator, get_product_from_ids_validator, get_product_validator, update_product_validator} from "App/Validators/ProductValidator";
+import { allChildren } from "./Tools/CategoriesUtil";
+import { paginate } from "./Tools/Utils";
 
-    if (!title || !description || !price || !caracteristique || !category_id) {
-      return "ERROR field required : { title,sub_title,description,price,category_id,caracteristique,}";
-    }
+export default class ProductsController {
+  public async create_product({request,auth}: HttpContextContract) {
+    const { title, description, price, category_id, caracteristique } =  await request.validate(create_product_validator);
 
     const photos = request.files("photos");
-    if (!(photos.length > 0)) {
+    
+    if (!(photos.length > 0)) {//##
       return "ERROR field required : files photos ";
     }
 
-    const category = await Category.findOrFail(category_id);
+    const category = await Category.find(category_id);
     if (!category) return "ERROR category.id=" + category_id + "not found";
+
     if (!category.is_parentable)
       return "ERROR this category can't be use like parent category, please choise another one";
+
     const id = v4();
     const account = await Account.getAccountByAuth(auth);
     if (!account) {
-      return "ERROR CONNEXION REQUIRED";
+      
     }
 
-    const photosUrl = await createFile(photos, id);
+    const photosUrl = await createFiles(photos, id);
     const product = await Product.create({
       id,
       title,
       description,
       price,
-      caracteristique: JSON.stringify(caracteristique),
+      caracteristique:caracteristique,
       status: Product.STATUS.AWAIT,
       account_id: account.id,
       category_id,
@@ -49,8 +47,6 @@ export default class ProductsController {
       // moderator_id:''
     });
 
-    console.log({ photosUrl });
-
     return {
       ...product.$attributes,
       provider: Account.formatAccount(account),
@@ -59,7 +55,8 @@ export default class ProductsController {
     };
   }
 
-  public async update_product({ request }: HttpContextContract) {
+  public async update_product({ request  , auth}: HttpContextContract) {
+    const body =  await request.validate(update_product_validator);
     const attributes = [
       "title",
       "description",
@@ -67,37 +64,34 @@ export default class ProductsController {
       "category_id",
       "caracteristique",
     ];
-    const filesAttributes = ["photos"];
-    const body = request.body(); //await request.validate({ schema: update_product_validator})
-    console.log('^^^^^^^^^^^^^',request.body());
+    const filesAttributes = ["photos"]
 
-    // if (body.category_id) {
-    //   //TODO trouver solution pour capturer l'error au lieu de trouver la cat..
-    //   const category = await Category.find(body.category_id);
-    //   if (!category) return "ERROR category not found";
-    // }
-
- 
+    const access = await auth.authenticate();
     
-    
-    const product = await Product.findByOrFail("id", body.id);
+    const product = await Product.findByOrFail("id", body.account_id);
 
     if (!product) {
       return "ERROR Product not found";
     }
+    if (product.account_id !== access.auth_table_id) {
+      return "ERROR Permission denied";
+    }
+    
     attributes.forEach((attribute) => {
       if (body[attribute]) product[attribute] = body[attribute];
     });
+    
     let urls :string[]; 
     const returnFiles = {}
+    
     for (const filesAttribute of filesAttributes) {
       const files = request.files(filesAttribute);
-      urls = await updateFile({
+      urls = await updateFiles({
         files,
         filesAttribute,
         lastUrls:product[filesAttribute],
         newPseudoUrls:body[filesAttribute],
-        tableId:body.id
+        tableId:body.account_id
       })
       product[filesAttribute] = JSON.stringify(urls);
       returnFiles[filesAttribute] = urls
@@ -105,19 +99,18 @@ export default class ProductsController {
    
     await product.save();
     const account = await Account.findOrFail(product.account_id);
+    
     return {
       ...product.$attributes,
-      provider: Account.formatAccount(account),
-   //   ...returnFiles
+      provider: Account.formatAccount(account)
     };
   }
 
   public async get_product({ request }: HttpContextContract) {
-    const { id } = request.body();
-    if (!id) return 'ERROR required => "id"';
-
-    const product = await Product.findByOrFail("id", id);
+    const { product_id } = await request.validate(get_product_validator);
+    const product = await Product.findByOrFail("id", product_id);
     const account = await Account.findOrFail(product.account_id);
+    
     return {
       ...product.$attributes,
       provider: Account.formatAccount(account),
@@ -125,33 +118,18 @@ export default class ProductsController {
   }
 
   public async filter_product({ request }: HttpContextContract) {
-    let { provider_id, page, limit, filter } = request.body() as {
-      provider_id?: string;
-      page?: number; //1
-      limit?: number; //30
-      filter?: {
-        text?: string;
-        order_by?: "date_desc" | "date_asc" | "price_desc" | "price_asc";
-        price?: [number, number];
-        category_id?: string;
-        // caracteristique?: string;
-      };
-    };
-
-    if (page && page < 1) return " page must be between [1 ,n] ";
-    if (limit && limit < 1) return " limite must be between [1 ,n] ";
-    page = page ?? 1;
-    limit = limit ?? Env.get("DEFAULT_LIMIT");
-
+    let { provider_id, page, limit, filter } = paginate( await request.validate(filter_product_validator))
     let query = Product.query().select("*");
     // .where("status", Product.STATUS.VALID); //TODO product.valid
 
     if (provider_id) {
       query = query.where("account_id", provider_id);
     }
+    
     if (filter?.price) {
-      query = query.andWhereBetween("price", filter.price);
+      query = query.andWhereBetween("price", filter.price as [number , number]);
     }
+    
     if (filter?.text) {
       const text = filter.text;
       const regex = `%${text.split("").join("%")}%`;
@@ -165,7 +143,7 @@ export default class ProductsController {
       (filter.category_id !== undefined || filter.category_id === null)
     ) {
       const list = [filter.category_id];
-      await CategoriesController.allChildren(filter.category_id, list);
+      await allChildren(filter.category_id, list);
       console.log({ list });
       query = query.andWhereIn("category_id", list);
     }
@@ -200,7 +178,7 @@ export default class ProductsController {
   }
 
   public async get_product_from_ids({ request }: HttpContextContract) {
-    const { ids } = request.body();
+    const { ids } = await request.validate(get_product_from_ids_validator);
     if (!Array.isArray(ids)) return 'ERROR required => "ids:uuid[]"';
 
     const products = await Database.from("accounts")

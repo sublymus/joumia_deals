@@ -1,15 +1,23 @@
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import Category from "App/Models/Category";
+import {
+  create_category_validation,
+  delete_category_validator,
+  get_category_all_child_list_validation,
+  get_category_child_list_validation,
+  get_category_from_ids_validation,
+  get_category_parents_validator,
+  get_category_validation,
+  update_category_validation,
+} from "App/Validators/CategoryValidator";
 import { v4 } from "uuid";
+import { allChildren, parentList } from "./Tools/CategoriesUtil";
 
 export default class CategoriesController {
   public async create_category({ request }: HttpContextContract) {
     const { label, caracteristique_field, parent_category_id, is_parentable } =
-      request.body();
+      await request.validate(create_category_validation);
 
-    if (!label || !caracteristique_field || is_parentable == undefined) {
-      return "ERROR field required : {label,carateristiqueField,parent_category_id,isParentable}";
-    }
     const id = v4();
     const category = await Category.create({
       label,
@@ -18,6 +26,7 @@ export default class CategoriesController {
       is_parentable: !!is_parentable,
       id,
     });
+
     return {
       ...category.$attributes,
       id,
@@ -25,116 +34,66 @@ export default class CategoriesController {
   }
 
   public async update_category({ request }: HttpContextContract) {
-    const attributes = [
-      "label",
-      "parent_category_id",
-      "is_parentable",
-    ];
-    const jsonAttributes = [
-      "caracteristique_field"
-    ]
-    const body = request.body();
+    const attributes = ["label", "parent_category_id", "is_parentable"];
+    const jsonAttributes = ["caracteristique_field"];
+    const body = await request.validate(update_category_validation);
 
-    if (!body.id) return 'ERROR required => "id"';
-    const category = await Category.findByOrFail("id", body.id);
+    const category = await Category.findByOrFail("id", body.category_id);
+
     attributes.forEach((attribute) => {
       if (body[attribute]) category[attribute] = body[attribute];
-    });  
-    jsonAttributes.forEach((attribute) => {
-      if (body[attribute]) category[attribute] = JSON.stringify(body[attribute]);
     });
+
+    jsonAttributes.forEach((attribute) => {
+      if (body[attribute])
+        category[attribute] = JSON.stringify(body[attribute]);
+    });
+
     await category.save();
+
     return category.$attributes;
   }
 
   public async get_category({ request }: HttpContextContract) {
-    const { id } = request.body();
-    if (!id) return 'ERROR required => "id"';
-
-    return (await Category.findOrFail(id)).$attributes;
+    const { category_id } = await request.validate(get_category_validation);
+    return (await Category.findOrFail(category_id)).$attributes;
   }
 
   public async get_category_from_ids({ request }: HttpContextContract) {
-    const { ids } = request.body();
-    if (!Array.isArray(ids)) return 'ERROR required => "ids:uuid[]"';
-
-    return await Category.query().whereIn("id", ids);
+    const { category_ids } = await request.validate(get_category_from_ids_validation);
+    return await Category.query().whereIn("id", category_ids);
   }
 
   public async get_category_child_list({ request }: HttpContextContract) {
-    const { id } = request.body();
-    if (!id) return 'ERROR required => "id"';
-
-    return await Category.query().where("parent_category_id", id);
+    const { category_id } = await request.validate(get_category_child_list_validation);
+    return await Category.query().where("parent_category_id", category_id);
   }
 
   public async get_category_all_child_list({ request }: HttpContextContract) {
-    const { id } = request.body();
-    if (typeof id !== "string" && id !== null) return 'ERROR required => "id"';
+    const { category_id } = await request.validate(
+      get_category_all_child_list_validation
+    );
+
     const listModel = [];
     const listId = [];
-    await CategoriesController.allChildren(id, listId, listModel, true);
+
+    await allChildren(category_id, listId, listModel, true);
+
     return listModel;
   }
 
-  private static allCategories: any = {};
-
-  public static async allChildren(
-    id: string | null,
-    listId: string[],
-    listModel?: any[],
-    includes?: boolean
-  ) {
-    if (includes) {
-      const cat = await Category.find(id);
-      if (cat) {
-        listId.push(cat.id);
-        listModel?.push(cat.$attributes);
-      }
-    }
-    let query = Category.query();
-    if (id) query = query.where("parent_category_id", id);
-    else query = query.whereNull("parent_category_id");
-    const children = await query;
-    for (const category of children) {
-      if (!listId.includes(category.id)) {
-        if (!CategoriesController.allCategories[category.id])
-          CategoriesController.allCategories[category.id] =
-            category.$attributes;
-        listId.push(category.id);
-        listModel?.push(category.$attributes);
-        await this.allChildren(category.id, listId, listModel);
-      }
-    }
-  }
-
-  public static async parentList(id:string){
-    
-    if (!id) return null;
-    const categories: any[] = [];
-    while (true) {
-      const category = await Category.find(id);
-      if (category) {
-        categories.push(category.$attributes);
-        id = category.parent_category_id;
-      } else {
-        break;
-      }
-    }
-    return categories
-  }
 
   public async get_category_parents({ request }: HttpContextContract) {
-    let { id } = request.body();
-   
-    return await CategoriesController.parentList(id);
+    let { category_id } = await request.validate(get_category_parents_validator);
+
+    return await parentList(category_id);
   }
+
   public async delete_category({ request }: HttpContextContract) {
-    const { id } = request.body();
-    if (!id) return 'ERROR required => "id"';
-    await (await Category.find(id))?.delete();
+    const { category_id } = await request.validate(delete_category_validator);
+    await (await Category.find(category_id))?.delete();
     return {
-      isDeleted:true
+      isDeleted: true,
     };
   }
 }

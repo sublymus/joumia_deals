@@ -95,25 +95,26 @@ cascad
     link
     visited
 
-# #ile_manage
-## ceateFile()
-## updateFile()
+# File_manage
+## ceateFiles()
+## updateFiles()
+deleteFiles()
 
-* / use whatsapp 
+## use whatsapp 
 
 Account_VALIDATION
 admin_VALIDATION
 auth_VALIDATION
 categories_VALIDATION
 favorites_VALIDATION
-Messenger_VALIDATION
+# Messenger_VALIDATION
 Moderator_VALIDATION
 Product_VALIDATION
 Recommendation_VALIDATION
 Reports_VALIDATION
 
-3 / ROUTE_MESSENGER
-4 / ROUTE_VOTE
+## ROUTE_MESSENGER
+## ROUTE_VOTE
 
 MIN_MAX (le strict minimux pour le produit)
 

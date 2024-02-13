@@ -8,7 +8,7 @@ export default class extends BaseSchema {
       table.uuid('id').primary().notNullable()
       table.text('name');
       table.text('description');
-      table.boolean('isDiscussion').notNullable();
+      table.boolean('is_discussion').notNullable();
       table.uuid('product_id').notNullable().references('id').inTable('products');
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })

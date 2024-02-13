@@ -2,20 +2,22 @@ import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import Env from "@ioc:Adonis/Core/Env";
 import fs from "fs";
 
-export async function createFile(
+export async function createFiles(
   files: ReturnType<HttpContextContract["request"]["files"]>,
   id: string
 ): Promise<string[]> {
   let urls: string[] = [];
   if (files?.length > 0) {
     let i = 0;
+    const random = Math.round(Math.random() * 10e6);
+
     const a = files.map((file) => {
       return new Promise(async (rev, rej) => {
         try {
           await file.move("./ert", {
-            name: `${Date.now().toString(32)}_${Math.round(
-              (Math.random() * 10) ^ 6
-            ).toString(36)}${i++}_${file.fieldName}_${id}.${file.extname}`,
+            name: `${Date.now().toString(32)}_${random.toString(36)}${i++}_${
+              file.fieldName
+            }_${id}.${file.extname}`,
             overwrite: true, // overwrite in case of conflict
           });
           rev(file.fileName);
@@ -32,7 +34,14 @@ export async function createFile(
   return urls;
 }
 
-export async function updateFile({
+export async function deleteFiles(id: string): Promise<number> {
+  let deletedFileCounter = 0;
+  console.log(id);
+
+  return deletedFileCounter;
+}
+
+export async function updateFiles({
   files,
   filesAttribute,
   lastUrls,
@@ -57,6 +66,7 @@ export async function updateFile({
   const pointer = filesAttribute + ".";
   if (_newPseudoUrls) {
     let i = 0;
+    const random = Math.round(Math.random() * 10e6);
     const promisesAdd = _newPseudoUrls.map((pseudoUrl) => {
       return new Promise(async (rev, rej) => {
         if (pseudoUrl.startsWith(pointer)) {
@@ -64,11 +74,9 @@ export async function updateFile({
           const file = files[index];
           try {
             await file.move(Env.get("FILE_STORAGE"), {
-              name: `${Date.now().toString(32)}_${Math.round(
-                (Math.random() * 10) ^ 6
-              ).toString(36)}${i++}_${file.fieldName}_${tableId}.${
-                file.extname
-              }`,
+              name: `${Date.now().toString(32)}_${random.toString(36)}${i++}_${
+                file.fieldName
+              }_${tableId}.${file.extname}`,
               overwrite: true, // overwrite in case of conflict
             });
             return rev(file.fileName);

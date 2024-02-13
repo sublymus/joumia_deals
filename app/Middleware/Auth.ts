@@ -13,7 +13,7 @@ export default class AuthMiddleware {
   /**
    * The URL to redirect to when request is Unauthorized
    */
-  protected redirectTo = '/login'
+  protected redirectTo = '/google_connexion'
 
   /**
    * Authenticates the current HTTP request against a custom set of defined
@@ -36,11 +36,10 @@ export default class AuthMiddleware {
       guardLastAttempted = guard
 
       if (await auth.use(guard).check()) {
-        /**
-         * Instruct auth to use the given guard as the default guard for
-         * the rest of the request, since the user authenticated
-         * succeeded here
-         */
+        // console.log("################ AUTH : ",auth.user);
+        const access = await auth.authenticate();
+        if (!access.auth_table_id) return false;
+
         auth.defaultGuard = guard
         return true
       }

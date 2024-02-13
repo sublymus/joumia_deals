@@ -1,7 +1,6 @@
 import { DateTime } from 'luxon'
 import {v4} from 'uuid'
-import { BaseModel, HasOne, beforeSave, column } from '@ioc:Adonis/Lucid/Orm'
-import Product from './Product'
+import { BaseModel, beforeSave, column } from '@ioc:Adonis/Lucid/Orm'
 
 export default class Group extends BaseModel {
   @column({ isPrimary: true })
@@ -17,7 +16,7 @@ export default class Group extends BaseModel {
   public isDiscussion: boolean
 
   @column()
-  public product_id: HasOne<typeof Product>
+  public product_id: string
 
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime

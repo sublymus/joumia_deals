@@ -2,13 +2,22 @@ import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import Database from "@ioc:Adonis/Lucid/Database";
 import FavoritesProduct from "App/Models/FavoritesProduct";
 import FavoritesAccount from "App/Models/FavoritesAccount";
+import {
+  add_favorite_account_validator,
+  add_favorite_product_validator,
+  delete_favorite_account_validator,
+  delete_favorite_product_validator,
+  get_favorite_accounts_validator,
+  get_favorite_products_validator,
+} from "App/Validators/FavoritesValidator";
+import { paginate } from "./Tools/Utils";
 
 export default class FavoritesController {
   public async add_favorite_product({ request, auth }: HttpContextContract) {
-    const { id: product_id } = request.body() as { id: string };
+    const { product_id } = await request.validate(
+      add_favorite_product_validator
+    );
     const access = await auth.authenticate();
-    if (!access.auth_table_id) return "E_INVALID_API_TOKEN: Invalid API token";
-    if (!product_id) return 'ERROR required => "id"';
 
     const favorite = await FavoritesProduct.create({
       account_id: access.auth_table_id,
@@ -18,11 +27,10 @@ export default class FavoritesController {
   }
 
   public async get_favorite_products({ request, auth }: HttpContextContract) {
-    const { limite, page } = request.body();
-    if (page < 1) return " page must be between [1 ,n] ";
-    if (limite < 1) return " limite must be between [1 ,n] ";
+    let { limit, page } =paginate(await request.validate(
+      get_favorite_products_validator
+    ))
     const access = await auth.authenticate();
-    if (!access.auth_table_id) return "E_INVALID_API_TOKEN: Invalid API token";
 
     const favorites = await Database.from("favorites_products")
       .select("*")
@@ -32,20 +40,21 @@ export default class FavoritesController {
       .select("products.updated_at as product_updated_at")
       .innerJoin("products", "products.id", "product_id")
       .where("favorites_products.account_id", access.auth_table_id)
-      .limit(limite)
-      .offset((page - 1) * limite);
+      .limit(limit)
+      .offset((page - 1) * limit);
 
     return favorites;
   }
 
   public async delete_favorite_product({ request, auth }: HttpContextContract) {
-    const { id } = request.body();
-    if (!id) return 'ERROR required => "id"';
+    const { product_id } = await request.validate(
+      delete_favorite_product_validator
+    );
     const access = await auth.authenticate();
-    if (!access.auth_table_id) return "E_INVALID_API_TOKEN: Invalid API token";
+
     await FavoritesProduct.query()
       .where("account_id", access.auth_table_id)
-      .andWhere("product_id", id)
+      .andWhere("product_id", product_id)
       .delete();
 
     return {
@@ -54,7 +63,9 @@ export default class FavoritesController {
   }
 
   public async add_favorite_account({ request, auth }: HttpContextContract) {
-    const { id: account_id } = request.body() as { id: string };
+    const { account_id } =  await request.validate(
+      add_favorite_account_validator
+    );
     if (!account_id) return 'ERROR required => "id"';
     const access = await auth.authenticate();
 
@@ -64,12 +75,13 @@ export default class FavoritesController {
     });
     return favorite.$attributes;
   }
+
   public async get_favorite_accounts({ request, auth }: HttpContextContract) {
-    const { limite, page } = request.body();
-    if (page < 1) return " page must be between [1 ,n] ";
-    if (limite < 1) return " limite must be between [1 ,n] ";
+    let { limit, page } = paginate(await request.validate(
+      get_favorite_accounts_validator
+    ));
+
     const access = await auth.authenticate();
-    if (!access.auth_table_id) return "E_INVALID_API_TOKEN: Invalid API token";
 
     const favorites = await Database.from("favorites_accounts")
       .select("*")
@@ -79,21 +91,21 @@ export default class FavoritesController {
       .select("accounts.updated_at as account_updated_at")
       .innerJoin("accounts", "accounts.id", "my_account_id")
       .where("my_account_id", access.auth_table_id)
-      .limit(limite)
-      .offset((page - 1) * limite);
+      .limit(limit)
+      .offset((page - 1) * limit);
 
     return favorites;
   }
 
   public async delete_favorite_account({ request, auth }: HttpContextContract) {
-    const { id } = request.body();
-    if (!id) return 'ERROR required => "id"';
+    const { account_id } = await request.validate(
+      delete_favorite_account_validator
+    );
     const access = await auth.authenticate();
-    if (!access.auth_table_id) return "E_INVALID_API_TOKEN: Invalid API token";
-    console.log({ id, table: access.auth_table_id });
+    console.log({ account_id, table: access.auth_table_id });
 
     await FavoritesAccount.query()
-      .where("other_account_id", id)
+      .where("other_account_id", account_id)
       .andWhere("my_account_id", access.auth_table_id)
       .delete();
 

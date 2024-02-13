@@ -21,13 +21,13 @@ type FieldOptions = {
   mime?: (string | [string, number])[];
 }[];
 
-function isString(a: any): a is Array<string> {
-  return typeof a?.[0] == "string";
-}
+// function isString(a: any): a is Array<string> {
+//   return typeof a?.[0] == "string";
+// }
 
-function isNumber(a: any): a is number {
-  return !Number.isNaN(Number(a))
-}
+// function isNumber(a: any): a is number {
+//   return !Number.isNaN(Number(a))
+// }
 function isDate(a: any): a is string {
   try {
     if (typeof a == "string") {
@@ -41,8 +41,8 @@ function isDate(a: any): a is string {
   }
   return true;
 }
-validator.rule("caracteristiqueJson", async (value, o, options) => {
-//   console.log({ value, o, root: options.root });
+validator.rule("caracteristiqueJson", async (_$, [body] :any[], options) => {
+//  console.log({ _$, body, root: options.root });
   // console.log('options.field',options.field);
 //   console.log('options',options);
   
@@ -52,6 +52,7 @@ validator.rule("caracteristiqueJson", async (value, o, options) => {
   let caracteristique: { [k: string]: string | number } = {};
   try {
     caracteristique = JSON.parse(root.caracteristique);
+    body.caracteristique = caracteristique;
     let category_id :string ='';
     if(root.category_id){
       category_id = root.category_id;
@@ -102,7 +103,7 @@ function getArrayJSON(value : any){
 function validField(
   rule: FieldOptions[0],
   caracteristique: { [k: string]: string | number },
-  caracteristique_files:ReturnType<HttpContextContract["request"]["files"]>
+  _caracteristique_files:ReturnType<HttpContextContract["request"]["files"]>
 ) {
   let value = caracteristique[rule.name];
 //   console.log({ value, name: rule.name, type: rule.type });
