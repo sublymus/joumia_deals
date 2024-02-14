@@ -1,6 +1,6 @@
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import {  validator } from "@ioc:Adonis/Core/Validator";
-import CategoriesController from "App/Controllers/Http/CategoriesController";
+import { parentList } from "App/Controllers/Http/Tools/CategoriesUtil";
 import Product from "App/Models/Product";
 
 
@@ -9,8 +9,8 @@ type FieldOptions = {
   type: "string" | "number" | "boolean" | "date" | "file";
   name: string;
   field: string;
+  icon?: string;
   placeholder?: string;
-  icon: string;
   require?: boolean;
   default?: string;
   match?: [string, string]; // regexString, i
@@ -60,7 +60,7 @@ validator.rule("caracteristiqueJson", async (_$, [body] :any[], options) => {
       const product = await Product.find(root.id);
       category_id = product?.category_id||'';
     }
-    const categories = await CategoriesController.parentList(category_id);
+    const categories = await parentList(category_id);
     if (!categories || categories.length <= 0) {
       throw new Error("category_id not found");
     }

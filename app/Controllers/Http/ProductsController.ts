@@ -4,20 +4,16 @@ import Account from "App/Models/Account";
 import Category from "App/Models/Category";
 import Product from "App/Models/Product";
 import { v4 } from "uuid";
-import { createFiles, updateFiles } from "./Tools/FilesManager";
 import {create_product_validator, filter_product_validator, get_product_from_ids_validator, get_product_validator, update_product_validator} from "App/Validators/ProductValidator";
 import { allChildren } from "./Tools/CategoriesUtil";
 import { paginate } from "./Tools/Utils";
+import { createFiles } from "./Tools/FileManager/CreateFiles";
+import { updateFiles } from "./Tools/FileManager/UpdateFiles";
+import { deleteFiles } from "./Tools/FileManager/DeleteFiles";
 
 export default class ProductsController {
   public async create_product({request,auth}: HttpContextContract) {
-    const { title, description, price, category_id, caracteristique } = request.body()  //await request.validate(create_product_validator);
-
-    const photos = request.files("photos");
-    
-    if (!(photos.length > 0)) {//##
-      return "ERROR field required : files photos ";
-    }
+    const { title, description, price, category_id, caracteristique , photos:p} =  await request.validate(create_product_validator);
 
     const category = await Category.find(category_id);
     if (!category) return "ERROR category.id=" + category_id + "not found";
@@ -27,11 +23,13 @@ export default class ProductsController {
 
     const id = v4();
     const account = await Account.getAccountByAuth(auth);
-    if (!account) {
-      
-    }
 
-    const photosUrl = await createFiles(photos, id);
+    const photosUrl =  await createFiles({
+      request,
+      column_name:'photos',
+      table_id:id,
+      table_name:'products',
+    });
     const product = await Product.create({
       id,
       title,
@@ -52,6 +50,7 @@ export default class ProductsController {
       provider: Account.formatAccount(account),
       photos: photosUrl,
       id,
+      lol: photosUrl.map(((e,i)=> [e,'photos.'+i])).flat(1)
     };
   }
 
@@ -68,7 +67,7 @@ export default class ProductsController {
 
     const access = await auth.authenticate();
     
-    const product = await Product.findByOrFail("id", body.account_id);
+    const product = await Product.findByOrFail("id", body.product_id);
 
     if (!product) {
       return "ERROR Product not found";
@@ -86,12 +85,14 @@ export default class ProductsController {
     
     for (const filesAttribute of filesAttributes) {
       const files = request.files(filesAttribute);
+      console.log(filesAttribute,files.map(f=>f.clientName));
+      
       urls = await updateFiles({
         files,
         filesAttribute,
         lastUrls:product[filesAttribute],
         newPseudoUrls:body[filesAttribute],
-        tableId:body.account_id
+        tableId:body.product_id
       })
       product[filesAttribute] = JSON.stringify(urls);
       returnFiles[filesAttribute] = urls
@@ -102,7 +103,8 @@ export default class ProductsController {
     
     return {
       ...product.$attributes,
-      provider: Account.formatAccount(account)
+      provider: Account.formatAccount(account),
+      photos:JSON.parse(product.photos)
     };
   }
 
@@ -114,12 +116,15 @@ export default class ProductsController {
     return {
       ...product.$attributes,
       provider: Account.formatAccount(account),
+      photos:JSON.parse(product.photos)
     };
   }
 
   public async filter_product({ request }: HttpContextContract) {
     let { provider_id, page, limit, filter } = paginate( await request.validate(filter_product_validator))
     let query = Database.query().from('products')
+    .select('*')
+    .select('products.id as id')
     .select('products.created_at as created_at')
     .innerJoin('accounts', 'accounts.id','products.account_id');
     // .where("status", Product.STATUS.VALID); //TODO product.valid
@@ -174,14 +179,11 @@ export default class ProductsController {
       }
     }
     const products = await query.limit(limit).offset((page - 1) * limit);
-    return {
-      ...products,
-    };
+    return products.map(p=>({...p, photos:JSON.parse(p.photos)}))
   }
 
   public async get_product_from_ids({ request }: HttpContextContract) {
     const { ids } = await request.validate(get_product_from_ids_validator);
-    if (!Array.isArray(ids)) return 'ERROR required => "ids:uuid[]"';
 
     const products = await Database.from("accounts")
       .select("*")
@@ -209,8 +211,7 @@ export default class ProductsController {
       aupdated_at: "updated_at",
       acreated_at: "created_at",
     };
-    return {
-      ...products.map((product) => {
+    return products.map((product) => {
         product.provider = {};
         for (const key in product) {
           if (accountAttributes.includes(key)) {
@@ -220,20 +221,20 @@ export default class ProductsController {
         }
         return {
           ...product,
+          photos:JSON.parse(product.photos),
           provider: Account.formatAccount({
             $attributes: product.provider,
           } as any),
         };
-      }),
-    };
+      })
   }
 
   public async delete_product({ request }: HttpContextContract) {
-    const { id } = request.body();
-    if (!id) return 'ERROR required => "id"';
-    await (await Product.find(id))?.delete();
-    return {
-      isDeleted: !(await Product.find(id)),
-    };
+    const { product_id } = request.body();
+    await deleteFiles(product_id)
+    // await (await Product.find(id))?.delete();
+    // return {
+    //   isDeleted: !(await Product.find(id)),
+    // };
   }
 }

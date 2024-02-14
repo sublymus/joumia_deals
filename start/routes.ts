@@ -75,3 +75,9 @@ Route.get('/try_token',()=>{
 Route.post('/',({response}:HttpContext)=>{
     response.redirect().toPath(`${Env.get('FRONT_ORIGINE')}`)
 });
+Route.get('/fs/:fileName',({params,response}:HttpContext)=>{
+
+response.download(`${Env.get("FILE_STORAGE")}/${params.fileName}`)
+
+});
+

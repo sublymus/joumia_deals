@@ -3,7 +3,6 @@ import Discussion from "App/Models/Discussion";
 import Message from "App/Models/Message";
 import Product from "App/Models/Product";
 import { v4 } from "uuid";
-import { createFiles } from "./Tools/FilesManager";
 import { paginate } from "./Tools/Utils";
 import {
   create_discussion_validator,
@@ -11,6 +10,8 @@ import {
   get_messages_validator,
   send_message_validator,
 } from "App/Validators/MessengerrsValidator";
+import { createFiles } from "./Tools/FileManager/CreateFiles";
+import { deleteFiles } from "./Tools/FileManager/DeleteFiles";
 
 export default class MessengersController {
   public async get_discussions({ auth }: HttpContextContract) {
@@ -48,8 +49,7 @@ export default class MessengersController {
     return discussion.$attributes;
   }
 
-  public async send_message({ request, auth, response }: HttpContextContract) {
-    console.log(response.response.);
+  public async send_message({ request, auth }: HttpContextContract) {
     
     const { discussion_id, text } = await request.validate(
       send_message_validator
@@ -61,7 +61,12 @@ export default class MessengersController {
     if(discussion.client_id !==access.auth_table_id && discussion.provider_id !==access.auth_table_id )return "ERROR permission denied" ;
 
     const message_id = v4();
-    const files = await createFiles(request.files("files"), message_id);
+    const files = await createFiles({
+      request,
+      column_name:'files',
+      table_id:message_id,
+      table_name:'messages',
+    });
     const message = await Message.create({
       id: message_id,
       text,
@@ -106,10 +111,17 @@ export default class MessengersController {
     
     const discussion = await Discussion.find(discussion_id);
     if(!discussion)return "ERROR discussion not found"
+    
     if(discussion.client_id ===access.auth_table_id ) discussion.client_id = null;
     if(discussion.provider_id ===access.auth_table_id ) discussion.provider_id = null;
+    
     if(discussion.provider_id ===null && discussion.client_id === null){
+      const messages = await Message.query().where("discussion_id", discussion_id)
+      messages.forEach(m => {
+        deleteFiles(m.id);
+      });
       await discussion.delete();
+
     }
     
     if(!discussion.$isDeleted){

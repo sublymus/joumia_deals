@@ -9,6 +9,7 @@ export class create_product_validator {
     description: schema.string(),
     price: schema.number(),
     category_id: schema.string(),
+    photos: schema.string(),
     caracteristique: schema.string({}, [
       rules.caracteristiqueJson(this.ctx.request.body()),
     ]),
@@ -19,7 +20,14 @@ export class update_product_validator {
   constructor(protected ctx: HttpContextContract) {}
 
   public schema = schema.create({
-    account_id: schema.string([rules.uuid({ version: 4 })]),
+    product_id: schema.string([rules.uuid({ version: 4 })]),
+    title: schema.string.optional(),
+    description: schema.string.optional(),
+    price: schema.number.optional(),
+    category_id: schema.string.optional(),
+    // caracteristique: schema.string.optional({}, [
+    //   rules.caracteristiqueJson(this.ctx.request.body()),
+    // ]),
   });
 
   public messages: CustomMessages = {};

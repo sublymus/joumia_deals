@@ -4,7 +4,7 @@ import { BaseModel, beforeSave, column } from '@ioc:Adonis/Lucid/Orm'
 
 export default class Discussion extends BaseModel {
   @column({ isPrimary: true })
-  public id: string
+  public id: string | null
 
   @column()
   public product_id: string

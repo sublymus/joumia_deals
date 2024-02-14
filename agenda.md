@@ -1,3 +1,8 @@
+# travaux commun
+category 
+min_max
+vistes
+recommendation link
 
 - analyser la concurence
 - cree les tables ( schema )
@@ -96,14 +101,14 @@ cascad
 ##  report
 ##  favorites
 ##  recommendation
-    link
-    visited
-
+link
+vited
 # File_manage
 ## ceateFiles()
 ## updateFiles()
-<!-- deleteFiles() // 2h -->
+## deleteFiles() // 2h
 <!-- on delete au moin 1 -->
+## access file
 ## use whatsapp 
 
 # Account_VALIDATION
@@ -129,27 +134,19 @@ SSE integration ( trouver une pist )//1h
 
 MIN_MAX (le strict minimux pour le produit)
 
+postgresql
+
 ROUTE_MEDRATOR
 RULES ACL
 
-## PERMISSION
+## PERMISSION 
 # user
 moderator
 admin
 
 ERROR
 
-<!-- 5 / follow -->
-
 inFavorite
-
-// db.inserte('account')
-// db.inserte('category')
-// db.inserte('product')
-// db.inserte('report')
-// db.inserte('recoomendation')
-// db.inserte('favorites')
-// db.inserte('visited')
 
 ROUTE_TRANSATION
 
@@ -158,6 +155,8 @@ TEST_VERCEL
 HOSTINGER_PROD
 TEST_PROD
 
-resize image
 
-postgresql
+
+
+resize image
+5 / follow

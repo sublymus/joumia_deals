@@ -66,7 +66,10 @@ export default class CategoriesController {
 
   public async get_category_child_list({ request }: HttpContextContract) {
     const { category_id } = await request.validate(get_category_child_list_validation);
-    return await Category.query().where("parent_category_id", category_id);
+    let query =  Category.query()
+    if(category_id) query = query.where("parent_category_id",category_id);
+    else query = query.whereNull("parent_category_id")
+    return await query
   }
 
   public async get_category_all_child_list({ request }: HttpContextContract) {

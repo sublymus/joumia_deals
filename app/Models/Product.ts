@@ -1,11 +1,12 @@
 import { DateTime } from 'luxon'
 import {v4} from 'uuid'
-import { BaseModel, beforeSave, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, beforeSave, beforeUpdate, column } from '@ioc:Adonis/Lucid/Orm'
 
 enum PRODUCT_STATUS{
   AWAIT,VALID,REJECT,DELETED,
 } 
 export default class Product extends BaseModel {
+  filesAttributes:string[] = []
   public static STATUS = PRODUCT_STATUS
   @column({ isPrimary: true })
   public id: string
@@ -49,8 +50,9 @@ export default class Product extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
    public updated_at: DateTime
 
-  @beforeSave()
-  public static async setUUID (product: Product) {
-   if(!product.id)product.id = v4()
-  }
+   @beforeSave()
+   public static async setUUID (product: Product) {
+    if(!product.id)product.id = v4()
+   }
+   
 }

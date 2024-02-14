@@ -9,7 +9,7 @@ export default class extends BaseSchema {
       table.string('text').notNullable()
       table.string('files').notNullable()
       table.uuid('account_id').notNullable().references('id').inTable('accounts');
-      table.uuid('discussion_id').notNullable().references('id').inTable('discussions');
+      table.uuid('discussion_id').notNullable().references('id').inTable('discussions').onDelete('CASCADE');
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })

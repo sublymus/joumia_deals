@@ -5,7 +5,7 @@ export default class extends BaseSchema {
 
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
-      table.uuid('id').primary().notNullable()
+      table.uuid('id').primary()
       table.uuid('client_id').references('id').inTable('accounts');
       table.uuid('provider_id').references('id').inTable('accounts');
       table.uuid('product_id').notNullable().references('id').inTable('products');
