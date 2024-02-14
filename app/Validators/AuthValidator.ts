@@ -7,7 +7,7 @@ export class create_user_validation {
   public schema = schema.create({
     phone: schema.string(),
     name: schema.string(),
-    avatar_url: schema.string(),
+    avatar_url: schema.string.optional(),
     location: schema.string(),
     email: schema.string(),
     use_whatsapp: schema.string(),

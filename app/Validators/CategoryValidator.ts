@@ -54,7 +54,7 @@ export class get_category_child_list_validation {
   constructor(protected ctx: HttpContextContract) {}
 
   public schema = schema.create({
-    category_id: schema.string([rules.uuid({ version: 4 })]),
+    category_id: schema.string.nullable([rules.uuid({ version: 4 })]),
   });
 
   public messages: CustomMessages = {};
@@ -64,7 +64,7 @@ export class get_category_all_child_list_validation {
   constructor(protected ctx: HttpContextContract) {}
 
   public schema = schema.create({
-    category_id: schema.string([rules.uuid({ version: 4 })]),
+    category_id: schema.string.nullable([rules.uuid({ version: 4 })]),
   });
 
   public messages: CustomMessages = {};

@@ -11,7 +11,7 @@ import { paginate } from "./Tools/Utils";
 
 export default class ProductsController {
   public async create_product({request,auth}: HttpContextContract) {
-    const { title, description, price, category_id, caracteristique } =  await request.validate(create_product_validator);
+    const { title, description, price, category_id, caracteristique } = request.body()  //await request.validate(create_product_validator);
 
     const photos = request.files("photos");
     
@@ -119,7 +119,9 @@ export default class ProductsController {
 
   public async filter_product({ request }: HttpContextContract) {
     let { provider_id, page, limit, filter } = paginate( await request.validate(filter_product_validator))
-    let query = Product.query().select("*");
+    let query = Database.query().from('products')
+    .select('products.created_at as created_at')
+    .innerJoin('accounts', 'accounts.id','products.account_id');
     // .where("status", Product.STATUS.VALID); //TODO product.valid
 
     if (provider_id) {
@@ -154,7 +156,7 @@ export default class ProductsController {
           query = query.orderBy("created_at", "asc");
           break;
 
-        case "date_desc":
+        case "date_desc": 
           query = query.orderBy("created_at", "desc");
           break;
 

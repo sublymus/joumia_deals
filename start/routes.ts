@@ -40,7 +40,6 @@ Route.group(()=>{
     Route.delete('/delete_recommendation_product','RecommendationsController.delete_recommendation_product');
 }).middleware('auth');
 
-
 Route.group(()=>{
     Route.post('/report_product','ReportsController.report_product');
     Route.post('/report_account','ReportsController.report_account');
@@ -57,12 +56,12 @@ Route.group(()=>{
     Route.delete('/delete_favorite_product','FavoritesController.delete_favorite_product');    
 }).middleware('auth');
 
-
 Route.group(()=>{
+    Route.post('/create_discussion','MessengersController.create_discussion');
+    Route.post('/get_discussions','MessengersController.get_discussions');
     Route.post('/send_message','MessengersController.send_message');
     Route.post('/get_messages','MessengersController.get_messages');
-    Route.post('/get_message','MessengersController.get_message');
-    Route.post('/get_discussions','MessengersController.get_discussions');
+   // Route.post('/get_message','MessengersController.get_message');
     Route.post('/delete_discussion','MessengersController.delete_discussion');
 }).middleware('auth');
 

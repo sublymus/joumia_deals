@@ -1,87 +1,123 @@
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
-import Group from "App/Models/Group";
+import Discussion from "App/Models/Discussion";
 import Message from "App/Models/Message";
 import Product from "App/Models/Product";
-import {
-  delete_discussions_validator,
-  get_discussions_validator,
-  get_message_validator,
-  get_messages_validator,
-  send_message_validator,
-} from "App/Validators/ProductValidator copy";
 import { v4 } from "uuid";
 import { createFiles } from "./Tools/FilesManager";
 import { paginate } from "./Tools/Utils";
+import {
+  create_discussion_validator,
+  delete_discussions_validator,
+  get_messages_validator,
+  send_message_validator,
+} from "App/Validators/MessengerrsValidator";
 
 export default class MessengersController {
-  public async get_discussions({ request, auth }: HttpContextContract) {
-    const {} = await request.validate({ schema: get_discussions_validator });
+  public async get_discussions({ auth }: HttpContextContract) {
     const access = await auth.authenticate();
-    if (!access.auth_table_id) return "E_INVALID_API_TOKEN: Invalid API token";
-    const discussions = await Group.query().select('*').where('account_id',access.auth_table_id)
-    return  discussions;
+    const discussions = await Discussion.query()
+      .select("*")
+      .where("client_id", access.auth_table_id)
+      .orWhere("provider_id", access.auth_table_id)
+      .orderBy("created_at", "desc");
+    return discussions;
   }
 
-  public async send_message({ request, auth }: HttpContextContract) {
-    const { product_id, text } = await request.validate({
-      schema: send_message_validator,
-    });
-    const access = await auth.authenticate();
-    if (!access.auth_table_id) return "E_INVALID_API_TOKEN: Invalid API token";
+  public async create_discussion({ auth, request }: HttpContextContract) {
+    const { product_id } = await request.validate(create_discussion_validator);
+    console.log(product_id);
 
-    const product = await Product.find(product_id);
-    if (!product) "ERROR product not found";
-    let group = await Group.findBy("product_id", product_id);
-    let group_id;
-    if (!group) {
-      group_id = v4();
-      group = await Group.create({
-        id:group_id,
+    const access = await auth.authenticate();
+    const discussions = await Discussion.query()
+      .where("product_id", product_id)
+      .andWhere("client_id", access.auth_table_id)
+      .limit(1);
+    let discussion = discussions[0];
+    if (!discussion) {
+      const product = await Product.find(product_id);
+      if (!product) return "ERROR product not found";
+      const id = v4();
+      discussion = await Discussion.create({
+        id,
         product_id,
-        isDiscussion: true,
+        provider_id: product.account_id,
+        client_id: access.auth_table_id,
       });
-    }else{
-      group_id = group.id;
+      discussion.id = id;
     }
+    return discussion.$attributes;
+  }
+
+  public async send_message({ request, auth, response }: HttpContextContract) {
+    console.log(response.response.);
+    
+    const { discussion_id, text } = await request.validate(
+      send_message_validator
+    );
+    const access = await auth.authenticate();
+
+    const discussion = await Discussion.find(discussion_id);
+    if (!discussion) return"ERROR product not found";
+    if(discussion.client_id !==access.auth_table_id && discussion.provider_id !==access.auth_table_id )return "ERROR permission denied" ;
+
     const message_id = v4();
-    const files= await createFiles(request.files('files'),message_id)
+    const files = await createFiles(request.files("files"), message_id);
     const message = await Message.create({
       id: message_id,
       text,
-      group_id,
-      files:JSON.stringify(files),
-      account_id:access.auth_table_id
+      discussion_id,
+      files: JSON.stringify(files),
+      account_id: access.auth_table_id,
     });
-    return { ...message.$attributes, id: message_id ,files};
+    return { ...message.$attributes, id: message_id, files };
   }
-
-  public async get_messages({ request, auth }: HttpContextContract) {
-    let {product_id, limit, page} = paginate(await request.validate({ schema: get_messages_validator }));
-
+ 
+  public async get_messages({ request ,auth}: HttpContextContract) {
+    let { discussion_id, limit, page } = paginate(
+      await request.validate(get_messages_validator)
+    );
     const access = await auth.authenticate();
-    if (!access.auth_table_id) return "E_INVALID_API_TOKEN: Invalid API token";
-    let group = await Group.findBy("product_id", product_id);
-    if(!group){
-      return []
+    let discussion = await Discussion.find(discussion_id);
+    if (!discussion) {
+      return [];
     }
-  
-    const messages = await Message.query().select('*').where('account_id',access.auth_table_id).andWhere('group_id',group.id) .limit(limit)
-    .offset((page - 1) * limit).orderBy('created_at','desc');
-    return messages
+    if(discussion.client_id !==access.auth_table_id && discussion.provider_id !==access.auth_table_id )return "ERROR permission denied" ;
+
+    const messages = await Message.query()
+      .where("discussion_id", discussion_id)
+      .limit(limit)
+      .offset((page - 1) * limit)
+      .orderBy("created_at", "desc");
+    return messages;
   }
 
-  public async get_message({ request, auth }: HttpContextContract) {
-    const {message_id} = await request.validate({ schema: get_message_validator });
-    const access = await auth.authenticate();
-    if (!access.auth_table_id) return "E_INVALID_API_TOKEN: Invalid API token";
-    const message = await Message.find(message_id);
-    if(!message) return "ERROR message not found";
-    return message
-  }
+  // public async get_message({ request }: HttpContextContract) {
+  //   const { message_id } = await request.validate(get_message_validator);
+  //   const message = await Message.find(message_id);
+  //   if (!message) return "ERROR message not found";
+  //   return message;
+  // }
 
   public async delete_discussion({ request, auth }: HttpContextContract) {
-    const {} = await request.validate({ schema: delete_discussions_validator });
+    console.log({body:request.body()});
+    
+    const {discussion_id} = await request.validate(delete_discussions_validator);
     const access = await auth.authenticate();
-    if (!access.auth_table_id) return "E_INVALID_API_TOKEN: Invalid API token";
+    
+    const discussion = await Discussion.find(discussion_id);
+    if(!discussion)return "ERROR discussion not found"
+    if(discussion.client_id ===access.auth_table_id ) discussion.client_id = null;
+    if(discussion.provider_id ===access.auth_table_id ) discussion.provider_id = null;
+    if(discussion.provider_id ===null && discussion.client_id === null){
+      await discussion.delete();
+    }
+    
+    if(!discussion.$isDeleted){
+      await discussion.save();
+    }
+
+    return {
+      deleted:true,
+    }
   }
 }

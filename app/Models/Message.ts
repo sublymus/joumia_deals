@@ -10,7 +10,7 @@ export default class Message extends BaseModel {
   public text: string
   
   @column()
-  public group_id:  string
+  public discussion_id:  string
 
   @column()
   public files:  string

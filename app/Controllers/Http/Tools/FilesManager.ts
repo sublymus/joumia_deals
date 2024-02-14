@@ -43,7 +43,6 @@ export async function deleteFiles(id: string): Promise<number> {
 
 export async function updateFiles({
   files,
-  filesAttribute,
   lastUrls,
   newPseudoUrls,
   tableId,
@@ -63,7 +62,7 @@ export async function updateFiles({
     if (newPseudoUrls) _newPseudoUrls = JSON.parse(newPseudoUrls);
     if (!Array.isArray(_newPseudoUrls)) _newPseudoUrls = [];
   } catch (error) {}
-  const pointer = filesAttribute + ".";
+  const pointer = files + ".";
   if (_newPseudoUrls) {
     let i = 0;
     const random = Math.round(Math.random() * 10e6);

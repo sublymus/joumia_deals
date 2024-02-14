@@ -9,16 +9,20 @@
 * PAGE_AUTH 
  
 
-PAGE_EDIT_MY_PROFILE
+*PAGE_EDIT_MY_PROFILE
 *PAGE_MY_PROFILE
 *PAGE_OTHER_PROFILE
 
-PAGE_CREATE_PRODUCT 
+*PAGE_CREATE_PRODUCT 
 PAGE_EDIT_PRODUCT
-PAGE_DETAIL_PRODUCT
+*PAGE_DETAIL_PRODUCT
 
 PAGE_MAIN (  COMP_CATEGORY , COMP_FILTER , COM_PRODUCT ) 
 NAV_FILTER 
+text
+category
+prix
+
 
 
 edit profile => page
@@ -66,8 +70,8 @@ ROUTE = 'creation de route +  creation du test'
 ##  delete_product
 ##  get_product_from_ids
 ##  filter_product 
-    valid_product
-    reject_product
+<!-- valid_product -->
+<!-- reject_product -->
 
 # ROUTE CGATEGORY  
 ##  create_category
@@ -98,34 +102,44 @@ cascad
 # File_manage
 ## ceateFiles()
 ## updateFiles()
-deleteFiles()
-
+<!-- deleteFiles() // 2h -->
+<!-- on delete au moin 1 -->
 ## use whatsapp 
 
-Account_VALIDATION
-admin_VALIDATION
-auth_VALIDATION
-categories_VALIDATION
-favorites_VALIDATION
+# Account_VALIDATION
+# auth_VALIDATION
+# categories_VALIDATION
+# favorites_VALIDATION
 # Messenger_VALIDATION
-Moderator_VALIDATION
-Product_VALIDATION
-Recommendation_VALIDATION
-Reports_VALIDATION
+# Moderator_VALIDATION
+# Product_VALIDATION
+<!-- -  rule:carateristiqueJson // 4h///////////////////// -->
+# Recommendation_VALIDATION
+# Reports_VALIDATION
 
-## ROUTE_MESSENGER
-## ROUTE_VOTE
+# ROUTE_MESSENGER
+## send message
+## get messages
+## get message
+## get discussions
+## delete discussion
+SSE integration ( trouver une pist )//1h
+
+ <!-- ROUTE_VOTE // 2h -->
 
 MIN_MAX (le strict minimux pour le produit)
 
-ROUTE_ADMIN
 ROUTE_MEDRATOR
 RULES ACL
-PERMISSION
 
-<!-- 5 / follow -->
+## PERMISSION
+# user
+moderator
+admin
 
 ERROR
+
+<!-- 5 / follow -->
 
 inFavorite
 
@@ -146,19 +160,4 @@ TEST_PROD
 
 resize image
 
-type FieldOptions = {
-  type: 'string' | 'number' | 'boolean' | 'date' | 'files';
-  name: string;
-  label: string,
-  placeholder?: string;
-  field: HTMLInputTypeAttribute;
-  require?: boolean;
-  default?: string;
-  icon: string;
-  match?: [string, string]; // regexString, i
-  enum?: (string[] | number[]);
-  min?: number;
-  max?: number;
-  maxSize?: number;
-  mime?: (string | [string, number])[];
-}[];
+postgresql
