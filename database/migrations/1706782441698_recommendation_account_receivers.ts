@@ -6,7 +6,7 @@ export default class extends BaseSchema {
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary()
-      table.uuid('recommendation_id').notNullable().references('id').inTable('recommendation_accounts')
+      table.uuid('recommendation_id').notNullable().references('id').inTable('recommendation_accounts').onDelete('CASCADE');
       table.uuid('receiver_account_id').notNullable().references('id').inTable('accounts')
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })

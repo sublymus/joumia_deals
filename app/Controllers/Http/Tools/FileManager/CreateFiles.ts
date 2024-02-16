@@ -6,7 +6,7 @@ type OptionsType = {
   min?: number;
   max?: number;
   extname?: string[];
-  throwError?:boolean
+  throwError?: boolean;
 };
 export async function createFiles({
   request,
@@ -19,42 +19,43 @@ export async function createFiles({
   table_id: string;
   table_name: string;
   column_name: string;
-  options?: OptionsType
+  options?: OptionsType;
 }): Promise<string[]> {
   let count = 0;
   const promises: Promise<any>[] = [];
-  const list: FileType[] = [];
-  const {extname,max,maxSize,min,throwError} = options||{}
+  const filesList: FileType[] = [];
+  const { extname, max, maxSize, min, throwError } = options || {};
   while (true) {
     const file = request.file(`${column_name}_${count++}`);
     if (!file) {
       break;
     }
-    list.push(file);
+    filesList.push(file);
   }
-  if (min && list.length < min) {
-    if(throwError) throw new Error("number of Files must be >= "+ min);
+  if (min && filesList.length < min) {
+    if (throwError) throw new Error("number of Files must be >= " + min);
     else return [];
   }
-  if (max && list.length > max) {
-    if(throwError) throw new Error("number of Files must be <= "+ min);
+  if (max && filesList.length > max) {
+    if (throwError) throw new Error("number of Files must be <= " + min);
     else return [];
   }
 
-  list.forEach((file) => {
-    if(!file) return
-    if (extname && !extname.includes(file.extname||'')) {
-      if(throwError) throw new Error("File bad Extension : "+ file?.extname);
+  filesList.forEach((file, i) => {
+    if (!file) return;
+    if (extname && !extname.includes(file.extname || "")) {
+      if (throwError) throw new Error("File bad Extension : " + file?.extname);
       else return;
     }
     if (maxSize && file.size > maxSize) {
-      if(throwError) throw new Error("File  size must be < "+ file.size+' byte');
+      if (throwError)
+        throw new Error("File  size must be < " + file.size + " byte");
       else return;
     }
     promises.push(
       moveFile({
         column_name,
-        count,
+        count: i,
         file,
         table_id,
         table_name,
@@ -63,11 +64,10 @@ export async function createFiles({
   });
   return (await Promise.allSettled(promises))
     .filter((f) => f.status == "fulfilled")
-    .map((m) => (m as any).value);
+    .map((m) => (m as any).value); //urls
 }
 
-
-function moveFile({
+export function moveFile({
   column_name,
   file,
   table_id,

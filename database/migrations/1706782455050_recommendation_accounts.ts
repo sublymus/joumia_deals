@@ -7,7 +7,7 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary()
       table.uuid('other_account_id').notNullable().references('id').inTable('accounts')
-      table.uuid('my_account_id').notNullable().references('id').inTable('accounts')
+      table.uuid('my_account_id').notNullable().references('id').inTable('accounts').onDelete('CASCADE');
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })

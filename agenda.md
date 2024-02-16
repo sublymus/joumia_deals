@@ -83,7 +83,7 @@ ROUTE = 'creation de route +  creation du test'
 ##  get_groduct
 ##  update_category
 ##  delete_category
-cascad
+##  cascad
 ##  get_category_from_ids
 ##  categories_filter
 
@@ -128,25 +128,32 @@ vited
 ## get message
 ## get discussions
 ## delete discussion
-SSE integration ( trouver une pist )//1h
 
- <!-- ROUTE_VOTE // 2h -->
+ERROR
 
-MIN_MAX (le strict minimux pour le produit)
-
-postgresql
+inFavorite
 
 ROUTE_MEDRATOR
 RULES ACL
+
+MIN_MAX (le strict minimux pour le produit)
+
+SSE integration ( trouver une pist )//1h
+
+resize image
+
+ <!-- ROUTE_VOTE // 2h -->
+
+
+postgresql
+
 
 ## PERMISSION 
 # user
 moderator
 admin
 
-ERROR
 
-inFavorite
 
 ROUTE_TRANSATION
 
@@ -158,5 +165,62 @@ TEST_PROD
 
 
 
-resize image
+
 5 / follow
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+annex 
+
+- se mettre d'accord sur la forme des donner de chaque route ( entres / sorties)

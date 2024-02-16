@@ -16,7 +16,7 @@ export default class extends BaseSchema {
       table.json('caracteristique');
       table.uuid('moderator_id').references('id').inTable('moderators');
       table.uuid('category_id').notNullable().references('id').inTable('categories');
-      table.uuid('account_id').notNullable().references('id').inTable('accounts');
+      table.uuid('account_id').notNullable().references('id').inTable('accounts').onDelete('CASCADE');;
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })

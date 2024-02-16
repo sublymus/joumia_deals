@@ -8,7 +8,7 @@ export default class extends BaseSchema {
       table.uuid('id').primary()
       table.uuid('client_id').references('id').inTable('accounts');
       table.uuid('provider_id').references('id').inTable('accounts');
-      table.uuid('product_id').notNullable().references('id').inTable('products');
+      table.uuid('product_id').notNullable().references('id').inTable('products').onDelete('CASCADE');
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })

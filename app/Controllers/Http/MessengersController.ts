@@ -26,7 +26,6 @@ export default class MessengersController {
 
   public async create_discussion({ auth, request }: HttpContextContract) {
     const { product_id } = await request.validate(create_discussion_validator);
-    console.log(product_id);
 
     const access = await auth.authenticate();
     const discussions = await Discussion.query()
@@ -104,7 +103,6 @@ export default class MessengersController {
   // }
 
   public async delete_discussion({ request, auth }: HttpContextContract) {
-    console.log({body:request.body()});
     
     const {discussion_id} = await request.validate(delete_discussions_validator);
     const access = await auth.authenticate();

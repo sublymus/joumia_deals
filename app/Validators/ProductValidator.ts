@@ -1,5 +1,7 @@
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
 import { schema, rules, CustomMessages } from "@ioc:Adonis/Core/Validator";
+import Category from "App/Models/Category";
+import Product from "App/Models/Product";
 
 export class create_product_validator {
   constructor(protected ctx: HttpContextContract) {}
@@ -8,10 +10,17 @@ export class create_product_validator {
     title: schema.string(),
     description: schema.string(),
     price: schema.number(),
+    photos:schema.string([
+      rules.toJSON()
+    ]),
     category_id: schema.string(),
-    photos: schema.string(),
     caracteristique: schema.string({}, [
-      rules.caracteristiqueJson(this.ctx.request.body()),
+      rules.caracteristiqueJson({
+        currentModel: Product,
+        caracteristiqueModel: Category,
+        caracteristiqueModel_id_field:'category_id',
+        caracteristique_description_field: 'caracteristique_field'
+      }),
     ]),
   });
 }
@@ -24,6 +33,7 @@ export class update_product_validator {
     title: schema.string.optional(),
     description: schema.string.optional(),
     price: schema.number.optional(),
+    photos: schema.string(),
     category_id: schema.string.optional(),
     // caracteristique: schema.string.optional({}, [
     //   rules.caracteristiqueJson(this.ctx.request.body()),

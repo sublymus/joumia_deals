@@ -2,6 +2,7 @@ import './RulesLauncher';
 import { HttpContext } from '@adonisjs/core/build/standalone';
 import Route from '@ioc:Adonis/Core/Route'
 import Env from '@ioc:Adonis/Core/Env';
+import transmit from '@adonisjs/transmit/build/services/transmit';
 
 Route.get('/google_connexion','AuthController.google_connexion');
 Route.get('/gl_push_info','AuthController.google_push_info');
@@ -77,7 +78,15 @@ Route.post('/',({response}:HttpContext)=>{
 });
 Route.get('/fs/:fileName',({params,response}:HttpContext)=>{
 
+    transmit.broadcast('chat/1',{message:Date.now()})
 response.download(`${Env.get("FILE_STORAGE")}/${params.fileName}`)
+
+});
+
+Route.get('/sse',({response}:HttpContext)=>{
+
+    transmit.broadcast('chat/1',{message:Date.now()})
+    response.noContent() 
 
 });
 

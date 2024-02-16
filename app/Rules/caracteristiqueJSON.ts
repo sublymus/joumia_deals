@@ -1,9 +1,15 @@
 import type { HttpContextContract } from "@ioc:Adonis/Core/HttpContext";
-import {  validator } from "@ioc:Adonis/Core/Validator";
+import { validator } from "@ioc:Adonis/Core/Validator";
 import { parentList } from "App/Controllers/Http/Tools/CategoriesUtil";
-import Product from "App/Models/Product";
+import { RuleAsyncStorage } from "../../providers/AppProvider";
+import { BaseModel } from "@ioc:Adonis/Lucid/Orm";
 
-
+export type CaracteristiqueJonInfo = {
+  currentModel: typeof BaseModel;
+  caracteristiqueModel: typeof BaseModel;
+  caracteristiqueModel_id_field: string;
+  caracteristique_description_field: string;
+};
 
 type FieldOptions = {
   type: "string" | "number" | "boolean" | "date" | "file";
@@ -21,13 +27,6 @@ type FieldOptions = {
   mime?: (string | [string, number])[];
 }[];
 
-// function isString(a: any): a is Array<string> {
-//   return typeof a?.[0] == "string";
-// }
-
-// function isNumber(a: any): a is number {
-//   return !Number.isNaN(Number(a))
-// }
 function isDate(a: any): a is string {
   try {
     if (typeof a == "string") {
@@ -41,72 +40,76 @@ function isDate(a: any): a is string {
   }
   return true;
 }
-validator.rule("caracteristiqueJson", async (_$, [body] :any[], options) => {
-//  console.log({ _$, body, root: options.root });
-  // console.log('options.field',options.field);
-//   console.log('options',options);
-  
-  // console.log('options.pointer',options.pointer);
 
-  const { root } = options;
-  let caracteristique: { [k: string]: string | number } = {};
-  try {
-    caracteristique = JSON.parse(root.caracteristique);
-    body.caracteristique = caracteristique;
-    let category_id :string ='';
-    if(root.category_id){
-      category_id = root.category_id;
-    }else if(root.id){
-      const product = await Product.find(root.id);
-      category_id = product?.category_id||'';
+validator.rule(
+  "caracteristiqueJson",
+  async (_v, [info]: [CaracteristiqueJonInfo], options) => {
+    const { root, field } = options;
+    const {
+      caracteristiqueModel_id_field,
+      currentModel,
+    } = info;
+    let caracteristique: { [k: string]: string | number } = {};
+
+    try {
+      caracteristique = JSON.parse(root[field]);
+      const merge = RuleAsyncStorage.getStore() as Record<string,any>
+      merge[field] = caracteristique;
+
+      let caract_model_id: string = "";
+
+      if (root[caracteristiqueModel_id_field]) {
+        caract_model_id = root[caracteristiqueModel_id_field];
+      } else if (root.id) {
+        const model = await currentModel.find(root.id);
+        caract_model_id = model?.[caracteristiqueModel_id_field] || "";
+      }
+
+      const categories = await parentList(caract_model_id);
+      if (!categories || categories.length <= 0) {
+        throw new Error(`ERROR  ${caracteristiqueModel_id_field}:${caract_model_id}  not found`);
+      }
+
+      const fields: FieldOptions = categories
+        ?.map((c) => {
+          try {
+            const filed = JSON.parse(c.caracteristique_field);
+            if (!Array.isArray(filed)) return [];
+            return filed;
+          } catch (error) {
+            return [];
+          }
+        })
+        .flat(1);
+
+      validFields(fields, caracteristique, root.caracteristique_files);
+    } catch (error) {
+      console.error(error.message);
+
+      return;
     }
-    const categories = await parentList(category_id);
-    if (!categories || categories.length <= 0) {
-      throw new Error("category_id not found");
-    }
-
-    const fields: FieldOptions = categories
-      ?.map((c) => {
-        try {
-          const filed = JSON.parse(c.caracteristique_field);
-          if (!Array.isArray(filed)) return [];
-          return filed;
-        } catch (error) {
-          return [];
-        }
-      })
-      .flat(1);
-
-    validFields(fields, caracteristique, root.caracteristique_files);
-  } catch (error) {
-    console.error(error.message);
-
-    return options.errorReporter.report(
-      options.pointer,
-      "caracteristiqueJson.json",
-      error.message
-    );
-  }
-},() => ({
+  },
+  () => ({
     allowUndefineds: true,
-  }));
+  })
+);
 
-function getArrayJSON(value : any){
+function getArrayJSON(value: any) {
   try {
-    const v = JSON.parse(value) 
-    return Array.isArray(v)?v:null;
+    const v = JSON.parse(value);
+    return Array.isArray(v) ? v : null;
   } catch (error) {
-    return null
+    return null;
   }
 }
 
 function validField(
   rule: FieldOptions[0],
   caracteristique: { [k: string]: string | number },
-  _caracteristique_files:ReturnType<HttpContextContract["request"]["files"]>
+  _caracteristique_files: ReturnType<HttpContextContract["request"]["files"]>
 ) {
   let value = caracteristique[rule.name];
-//   console.log({ value, name: rule.name, type: rule.type });
+  //   console.log({ value, name: rule.name, type: rule.type });
 
   if (value != undefined) {
     if (rule.type == "string") {
@@ -127,7 +130,7 @@ function validField(
           throw new Error(
             `ERROR ${rule.name}:${value},  must be a value > ${rule.min}`
           );
-        if (rule.match && !(new RegExp(rule.match[0], rule.match[1]).test(value)))
+        if (rule.match && !new RegExp(rule.match[0], rule.match[1]).test(value))
           throw new Error(
             `ERROR ${rule.name}:${value},  regExp no match : ${rule.match}`
           );
@@ -172,14 +175,17 @@ function validField(
             ).toDateString()}`
           );
       }
-    } else if (rule.type == "boolean"){
-      if(typeof value !== "boolean")throw new Error(
-        `'ERROR caracteristique.${rule.name} must be a boolean value`
-      );
-    }else if (rule.type == 'file'){
-      const v = getArrayJSON(value)
-     if(!v) throw new Error(`ERROR ${rule.name}:${value},  must be an Array like : ['carateristique_files.n',..] where n is index number`);
-     
+    } else if (rule.type == "boolean") {
+      if (typeof value !== "boolean")
+        throw new Error(
+          `'ERROR caracteristique.${rule.name} must be a boolean value`
+        );
+    } else if (rule.type == "file") {
+      const v = getArrayJSON(value);
+      if (!v)
+        throw new Error(
+          `ERROR ${rule.name}:${value},  must be an Array like : ['carateristique_files.n',..] where n is index number`
+        );
     }
   } else {
     if (rule.require == true) throw new Error("ERROR require " + rule.name);
@@ -188,10 +194,9 @@ function validField(
 function validFields(
   fields: FieldOptions,
   caracteristique: { [k: string]: string | number },
-  caracteristique_files:ReturnType<HttpContextContract["request"]["files"]>
+  caracteristique_files: ReturnType<HttpContextContract["request"]["files"]>
 ) {
   for (const rule of fields) {
-    
     validField(rule, caracteristique, caracteristique_files);
   }
 }

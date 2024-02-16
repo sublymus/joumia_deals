@@ -102,7 +102,6 @@ export default class FavoritesController {
       delete_favorite_account_validator
     );
     const access = await auth.authenticate();
-    console.log({ account_id, table: access.auth_table_id });
 
     await FavoritesAccount.query()
       .where("other_account_id", account_id)
