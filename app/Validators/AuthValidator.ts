@@ -10,7 +10,7 @@ export class create_user_validation {
     avatar_url: schema.string.optional(),
     location: schema.string(),
     email: schema.string(),
-    use_whatsapp: schema.string(),
+    use_whatsapp: schema.number.optional(),
     oauth_client_id: schema.string(),
     oauth_provider_name: schema.string()
   });

@@ -62,7 +62,7 @@ export class filter_product_validator {
     limit: schema.number.optional(),
     filter: schema.object.optional().members({
       text: schema.string.optional(),
-      order_by: schema.enum.optional(["desc", "asc"]),
+      order_by: schema.enum.optional(["price_desc","price_asc", "date_asc", "date_desc"]),
       price: schema.array
         .optional([rules.minLength(2), rules.maxLength(2)])
         .members(schema.number()),
