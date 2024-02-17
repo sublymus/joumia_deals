@@ -10,9 +10,6 @@ export class create_product_validator {
     title: schema.string(),
     description: schema.string(),
     price: schema.number(),
-    photos:schema.string([
-      rules.toJSON()
-    ]),
     category_id: schema.string(),
     caracteristique: schema.string({}, [
       rules.caracteristiqueJson({
@@ -67,6 +64,7 @@ export class filter_product_validator {
         .optional([rules.minLength(2), rules.maxLength(2)])
         .members(schema.number()),
       category_id: schema.string.optional(),
+      status : schema.enum.optional([0,1,2,3,4])
     }),
   });
 

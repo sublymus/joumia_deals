@@ -41,8 +41,6 @@ export async function updateFiles({
 
   const pointer = column_name + "_";
   let fileLength = 0;
-  console.log('>>>>>>>>_newPseudoUrls ',_newPseudoUrls);
-  console.log('>>>>>>>>newPseudoUrls ',newPseudoUrls);
   
   const promisesAdd = _newPseudoUrls.map((pseudoUrl, i) => {
     try {
@@ -61,8 +59,7 @@ export async function updateFiles({
           else return Promise.reject(null);
         }
         fileLength++;
-        console.log("### pseudoUrl ", fileLength, pseudoUrl);
-
+    
         return moveFile({ file, column_name, count: i, table_id, table_name });
       } else {
         const filePath = `${Env.get("FILE_STORAGE")}/${pseudoUrl}`;
@@ -76,7 +73,7 @@ export async function updateFiles({
     }
   });
 
-  let newUrls: string[] = [];
+  let newUrls: string[] = []; 
 
   if (min && fileLength < min) {
     if (throwError) throw new Error("number of Files must be >= " + min);

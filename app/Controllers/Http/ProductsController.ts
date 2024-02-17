@@ -143,20 +143,32 @@ export default class ProductsController {
     };
   }
 
-  public async filter_product({ request }: HttpContextContract) {
+  public async filter_product({ request, auth }: HttpContextContract) {
+    const access = await auth.authenticate();
     let { provider_id, page, limit, filter } = paginate(
       await request.validate(filter_product_validator)
     );
     let query = Database.query()
       .from("products")
-      .select("*")
+      .select("avatar_url")
+      .select("photos")
+      .select("price")
+      .select("name")
+      .select("location")
+      .select("title")
+      .select("caracteristique")
+      .select("status")
       .select("products.id as id")
-      .select("products.created_at as created_at")
+      .select("products.created_at as product_created_at")
       .innerJoin("accounts", "accounts.id", "products.account_id");
     // .where("status", Product.STATUS.VALID); //TODO product.valid
 
     if (provider_id) {
       query = query.where("account_id", provider_id);
+    }
+    if (provider_id && provider_id == access?.auth_table_id && filter?.status) {
+      
+      query = query.where("status", filter.status);
     }
 
     if (filter?.price) {
@@ -203,8 +215,12 @@ export default class ProductsController {
           break;
       }
     }
+    const total = (await query).length;
     const products = await query.limit(limit).offset((page - 1) * limit);
-    return products.map((p) => ({ ...p, photos: JSON.parse(p.photos) }));
+    return{
+      total,
+      products :products.map((p) => ({ ...p, photos: JSON.parse(p.photos),caracteristique: JSON.parse(p.caracteristique) }))
+    } 
   }
 
   public async get_product_from_ids({ request }: HttpContextContract) {
@@ -257,9 +273,9 @@ export default class ProductsController {
   public async delete_product({ request }: HttpContextContract) {
     const { product_id } = request.body();
     await deleteFiles(product_id);
-    // await (await Product.find(id))?.delete();
-    // return {
-    //   isDeleted: !(await Product.find(id)),
-    // };
+    await (await Product.find(product_id))?.delete();
+    return {
+      isDeleted: !(await Product.find(product_id)),
+    };
   }
 }

@@ -87,12 +87,16 @@ export default class MessengersController {
     }
     if(discussion.client_id !==access.auth_table_id && discussion.provider_id !==access.auth_table_id )return "ERROR permission denied" ;
 
-    const messages = await Message.query()
-      .where("discussion_id", discussion_id)
-      .limit(limit)
+    const query = Message.query()
+    .where("discussion_id", discussion_id);
+    const total = (await query).length;
+    const messages = await query.limit(limit)
       .offset((page - 1) * limit)
       .orderBy("created_at", "desc");
-    return messages;
+    return {
+      total,
+      messages
+    };
   }
 
   // public async get_message({ request }: HttpContextContract) {

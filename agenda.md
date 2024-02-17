@@ -107,7 +107,7 @@ vited
 ## ceateFiles()
 ## updateFiles()
 ## deleteFiles() // 2h
-<!-- on delete au moin 1 -->
+## on delete au moin 1
 ## access file
 ## use whatsapp 
 
@@ -118,7 +118,7 @@ vited
 # Messenger_VALIDATION
 # Moderator_VALIDATION
 # Product_VALIDATION
-<!-- -  rule:carateristiqueJson // 4h///////////////////// -->
+#  rule:carateristiqueJson // 4h/////////////////////
 # Recommendation_VALIDATION
 # Reports_VALIDATION
 
@@ -129,23 +129,49 @@ vited
 ## get discussions
 ## delete discussion
 
+<!-- ~ Pagination -->
+
+~ miniature [1]
+
+~ resize image ajouter le text
+
+~ parse tout les json
+
 ERROR
 
-inFavorite
+<!-- ~ ajouter etat au proctuct   ////  dans la caracteristique -->
+
 
 ROUTE_MEDRATOR
 RULES ACL
 
-MIN_MAX (le strict minimux pour le produit)
+<!-- MIN_MAX (le strict minimux pour le produit)
+
+filter product -  favorites
+
+avatar
+name
+lacation
+
+name product
+price
+etat =  [  ////  dans la caracteristique
+    Etat neuf,
+    tres bon etat,
+    etat bon,
+    etat etat
+    satisfaisant,
+    pour pieces
+]
+ceation date
+et les 4 premiere caracteristiqyue -->
 
 SSE integration ( trouver une pist )//1h
-
-resize image
 
  <!-- ROUTE_VOTE // 2h -->
 
 
-postgresql
+postgresql  
 
 
 ## PERMISSION 
@@ -153,17 +179,12 @@ postgresql
 moderator
 admin
 
-
-
 ROUTE_TRANSATION
 
 DOKER_IMAGE
 TEST_VERCEL
 HOSTINGER_PROD
 TEST_PROD
-
-
-
 
 
 5 / follow

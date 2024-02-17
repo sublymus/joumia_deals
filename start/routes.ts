@@ -2,7 +2,7 @@ import './RulesLauncher';
 import { HttpContext } from '@adonisjs/core/build/standalone';
 import Route from '@ioc:Adonis/Core/Route'
 import Env from '@ioc:Adonis/Core/Env';
-import transmit from '@adonisjs/transmit/build/services/transmit';
+// import transmit from '@adonisjs/transmit/build/services/transmit';
 
 Route.get('/google_connexion','AuthController.google_connexion');
 Route.get('/gl_push_info','AuthController.google_push_info');
@@ -53,6 +53,7 @@ Route.group(()=>{
     Route.post('/add_favorite_product','FavoritesController.add_favorite_product');
     Route.post('/get_favorite_accounts','FavoritesController.get_favorite_accounts');
     Route.post('/get_favorite_products','FavoritesController.get_favorite_products');
+    Route.post('/get_all_favorite_products_id','FavoritesController.get_all_favorite_products_id');
     Route.delete('/delete_favorite_account','FavoritesController.delete_favorite_account');
     Route.delete('/delete_favorite_product','FavoritesController.delete_favorite_product');    
 }).middleware('auth');
@@ -77,16 +78,8 @@ Route.post('/',({response}:HttpContext)=>{
     response.redirect().toPath(`${Env.get('FRONT_ORIGINE')}`)
 });
 Route.get('/fs/:fileName',({params,response}:HttpContext)=>{
-
-    transmit.broadcast('chat/1',{message:Date.now()})
 response.download(`${Env.get("FILE_STORAGE")}/${params.fileName}`)
 
 });
 
-Route.get('/sse',({response}:HttpContext)=>{
-
-    transmit.broadcast('chat/1',{message:Date.now()})
-    response.noContent() 
-
-});
 
