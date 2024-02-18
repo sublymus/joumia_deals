@@ -155,9 +155,13 @@ export default class ProductsController {
       .select("price")
       .select("name")
       .select("location")
+      .select("location")
       .select("title")
       .select("caracteristique")
       .select("status")
+      .select("description")
+      .select('category_id')
+      .select('express_time')
       .select("products.id as id")
       .select("products.created_at as product_created_at")
       .innerJoin("accounts", "accounts.id", "products.account_id");
@@ -195,11 +199,11 @@ export default class ProductsController {
     if (filter?.order_by) {
       switch (filter.order_by) {
         case "date_asc":
-          query = query.orderBy("created_at", "asc");
+          query = query.orderBy("products.created_at", "asc");
           break;
 
         case "date_desc":
-          query = query.orderBy("created_at", "desc");
+          query = query.orderBy("products.created_at", "desc");
           break;
 
         case "price_asc":
@@ -211,7 +215,7 @@ export default class ProductsController {
           break;
 
         default:
-          query = query.orderBy("created_at", "desc");
+          query = query.orderBy("products.created_at", "desc");
           break;
       }
     }

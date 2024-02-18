@@ -1,6 +1,5 @@
 # travaux commun
-category 
-min_max
+category
 vistes
 recommendation link
 
@@ -109,7 +108,8 @@ vited
 ## deleteFiles() // 2h
 ## on delete au moin 1
 ## access file
-## use whatsapp 
+## use whatsapp
+## edit account image  
 
 # Account_VALIDATION
 # auth_VALIDATION
@@ -129,49 +129,20 @@ vited
 ## get discussions
 ## delete discussion
 
-<!-- ~ Pagination -->
+## Pagination
+## resize image ajouter le text
+## parse tout les json
 
-~ miniature [1]
+## MIN_MAX (le strict minimux pour le produit)
 
-~ resize image ajouter le text
+## ROUTE_VOTE // 2h
 
-~ parse tout les json
-
-ERROR
-
-<!-- ~ ajouter etat au proctuct   ////  dans la caracteristique -->
-
+SSE integration ( trouver une pist )//1h
 
 ROUTE_MEDRATOR
 RULES ACL
 
-<!-- MIN_MAX (le strict minimux pour le produit)
-
-filter product -  favorites
-
-avatar
-name
-lacation
-
-name product
-price
-etat =  [  ////  dans la caracteristique
-    Etat neuf,
-    tres bon etat,
-    etat bon,
-    etat etat
-    satisfaisant,
-    pour pieces
-]
-ceation date
-et les 4 premiere caracteristiqyue -->
-
-SSE integration ( trouver une pist )//1h
-
- <!-- ROUTE_VOTE // 2h -->
-
-
-postgresql  
+ERROR
 
 
 ## PERMISSION 
@@ -181,13 +152,18 @@ admin
 
 ROUTE_TRANSATION
 
+postgresql  
 DOKER_IMAGE
+filter cararateristique;
+
 TEST_VERCEL
 HOSTINGER_PROD
 TEST_PROD
 
-
+<!-- ~ ajouter etat au proctuct   ////  dans la caracteristique -->
+<!-- 
 5 / follow
+~ miniature [1] -->
 
 
 

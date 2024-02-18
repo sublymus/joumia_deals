@@ -123,8 +123,10 @@ export function moveFile({
             left: iw - lw,
           },
         ])
-        .toFile(`${Env.get("FILE_STORAGE")}/${fileName}`);
-        rev(fileName);
+        .toFile(`${Env.get("FILE_STORAGE")}/${fileName}`, ()=>{
+          rev(fileName)
+        });
+        
     } catch (error) {
       rej(null);
     }

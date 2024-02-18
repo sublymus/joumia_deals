@@ -51,9 +51,15 @@ export default class Account extends BaseModel {
   }
 
   public static  formatAccount(account: Account) {
-    
+    let avatar_url:string[];
+    try {
+      avatar_url = JSON.parse(account.$attributes.avatar_url)
+    } catch (error) {
+      avatar_url = [account.$attributes.avatar_url]
+    }
     return {
       ...account.$attributes,
+      avatar_url,
       access_id: undefined,
       acl_id: undefined,
       created_at : account.$attributes.created_at.toString(),

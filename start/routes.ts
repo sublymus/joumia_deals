@@ -67,6 +67,11 @@ Route.group(()=>{
     Route.post('/delete_discussion','MessengersController.delete_discussion');
 }).middleware('auth');
 
+Route.group(()=>{
+    Route.post('/vote_account','VoteController.vote_account');
+    Route.post('/get_account_votes','VoteController.get_account_votes');
+}).middleware('auth');
+
 
 Route.get('/try_token',()=>{
     return {

@@ -2,10 +2,11 @@
 -- DELETE FROM  accounts;
 -- DROP TABLE favorites_products;
 -- SELECT * FROM access_oauths;
-SELECT * FROM accounts; 
-SELECT * FROM products; 
-SELECT * FROM messages; 
-SELECT * FROM discussions; 
+-- SELECT * FROM accounts; 
+-- SELECT * FROM products; 
+-- SELECT * FROM messages; 
+-- SELECT * FROM discussions; 
+SELECT * FROM votes; 
 -- SELECT * FROM recommendation_accounts;
 -- SELECT * FROM recommendation_products;
 -- SELECT * FROM report_accounts;
@@ -24,10 +25,22 @@ SELECT * FROM discussions;
 -- Maison
 -- Terrain
 
+-- DROP TABLE votes;
+
+-- CREATE TABLE IF NOT EXISTS "votes" (
+-- 	"id"	char(36) NOT NULL,
+-- 	"star"	integer NOT NULL,
+-- 	"provider_account_id"	char(36) NOT NULL,
+-- 	"client_account_id"	char(36) NOT NULL,
+-- 	"created_at"	datetime,
+-- 	"updated_at"	datetime,
+-- 	FOREIGN KEY("client_account_id") REFERENCES "accounts"("id"),
+-- 	FOREIGN KEY("provider_account_id") REFERENCES "accounts"("id"),
+-- 	PRIMARY KEY("id")
+-- );
 
 
 
-
-
-
-
+SELECT sum(votes),avg(star) from (
+    select count(`id`) as `votes`, avg(`star`) as `star` from `votes` where `provider_account_id` = '6c6a546d-429d-4120-b907-4bc782958bb7' group by `id` 
+);

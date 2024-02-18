@@ -171,7 +171,7 @@ async function pusf_info(
       name: name,
       use_whatsapp:false,
       email,
-      avatar_url,
+      avatar_url:JSON.stringify([avatar_url]),
       oauth_client_id: acces_oauth.password,
       oauth_provider_name: acces_oauth.$attributes.oauth_provider_name,
     })

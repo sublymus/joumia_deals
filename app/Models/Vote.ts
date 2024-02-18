@@ -1,17 +1,18 @@
 import { DateTime } from 'luxon'
 import {v4} from 'uuid'
-import { BaseModel, HasOne, beforeSave, column, hasOne } from '@ioc:Adonis/Lucid/Orm'
-import Account from './Account'
-
+import { BaseModel, beforeSave, column } from '@ioc:Adonis/Lucid/Orm'
 export default class Vote extends BaseModel {
   @column({ isPrimary: true })
   public id: string
 
-  @hasOne(()=>Account)
-  public provider_account:  HasOne<typeof Account>
-
-  @hasOne(()=>Account)
-  public client_account:  HasOne<typeof Account>
+  @column()
+  public star : number;
+  
+  @column()
+  public provider_account_id:  string
+ 
+  @column()
+  public client_account_id:  string
 
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime
